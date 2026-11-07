@@ -2,12 +2,11 @@
   "name": "ss-afterplay",
   "version": "1.0.0",
   "private": true,
-  "description": "SS AFTERPLAY — a cinematic gaming archive and journal.",
+  "description": "SS AFTERPLAY \u2014 a cinematic gaming archive and journal.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "create-admin": "node scripts/create-admin.mjs"
   },
