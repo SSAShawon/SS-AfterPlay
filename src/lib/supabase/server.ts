@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+import { dbOptions, noStoreFetch } from "./fetch";
+
 /**
  * Session-aware server client. Uses the publishable/anon key plus the
  * administrator's auth cookie, so every statement is still governed by RLS.
@@ -12,6 +14,8 @@ export async function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      db: dbOptions,
+      global: { fetch: noStoreFetch },
       cookies: {
         getAll() {
           return cookieStore.getAll();

@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
+import { dbOptions, noStoreFetch } from "@/lib/supabase/fetch";
+
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL ?? "samsul261103@gmail.com").toLowerCase();
 
 /**
@@ -19,6 +21,8 @@ export async function middleware(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
+        db: dbOptions,
+        global: { fetch: noStoreFetch },
         cookies: {
           getAll() {
             return request.cookies.getAll();
