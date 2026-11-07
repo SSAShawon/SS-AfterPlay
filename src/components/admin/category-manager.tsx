@@ -114,7 +114,7 @@ export function CategoryManager({ categories }: { categories: JournalCategory[] 
             setAdding((value) => !value);
             setOpenId(null);
           }}
-          className="inline-flex h-9 items-center gap-1.5 border border-white/15 px-3 font-mono text-[9px] uppercase tracking-[0.16em] text-soft transition-colors hover:border-blood/50 hover:bg-blood/[0.06]"
+          className="inline-flex h-9 items-center gap-1.5 border border-line-strong px-3 font-mono text-[9px] uppercase tracking-[0.16em] text-soft transition-colors hover:border-blood/50 hover:bg-blood/[0.06]"
         >
           {adding ? <X className="size-3" /> : <Plus className="size-3" />}
           {adding ? "Cancel" : "New category"}
@@ -131,7 +131,7 @@ export function CategoryManager({ categories }: { categories: JournalCategory[] 
         {categories.map((category) => {
           const isOpen = openId === category.id;
           return (
-            <li key={category.id} className="border border-white/10 bg-[#0b0c10]">
+            <li key={category.id} className="border border-line bg-charcoal">
               <div className="flex items-center gap-3 px-4 py-3">
                 <div className="min-w-0 flex-1">
                   <p className="text-[13px] text-soft">{category.name}</p>
@@ -143,7 +143,7 @@ export function CategoryManager({ categories }: { categories: JournalCategory[] 
                   type="button"
                   onClick={() => setOpenId(isOpen ? null : category.id)}
                   aria-label="Edit category"
-                  className="flex size-8 items-center justify-center border border-white/12 text-silver/60 transition-colors hover:text-soft"
+                  className="flex size-8 items-center justify-center border border-line text-silver/60 transition-colors hover:text-soft"
                 >
                   <Pencil className="size-3.5" />
                 </button>
@@ -156,7 +156,7 @@ export function CategoryManager({ categories }: { categories: JournalCategory[] 
                 />
               </div>
               {isOpen && (
-                <div className="border-t border-white/10 p-4">
+                <div className="border-t border-line p-4">
                   <CategoryForm category={category} onDone={() => setOpenId(null)} />
                 </div>
               )}
@@ -164,7 +164,7 @@ export function CategoryManager({ categories }: { categories: JournalCategory[] 
           );
         })}
         {categories.length === 0 && (
-          <li className="border border-dashed border-white/12 px-4 py-6 text-center text-[12px] text-silver/45">
+          <li className="border border-dashed border-line px-4 py-6 text-center text-[12px] text-silver/45">
             No categories yet.
           </li>
         )}

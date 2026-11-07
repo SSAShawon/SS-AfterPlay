@@ -45,7 +45,7 @@ export default async function EditGamePage({ params }: PageProps) {
           <>
             <Link
               href="/admin/games"
-              className="inline-flex h-10 items-center border border-white/15 px-4 font-mono text-[10px] uppercase tracking-[0.18em] text-silver/70 transition-colors hover:text-soft"
+              className="inline-flex h-10 items-center border border-line-strong px-4 font-mono text-[10px] uppercase tracking-[0.18em] text-silver/70 transition-colors hover:text-soft"
             >
               All games
             </Link>
@@ -53,7 +53,7 @@ export default async function EditGamePage({ params }: PageProps) {
               <Link
                 href={`/games/${game.slug}`}
                 target="_blank"
-                className="inline-flex h-10 items-center gap-2 border border-white/15 px-4 font-mono text-[10px] uppercase tracking-[0.18em] text-soft transition-colors hover:border-blood/50"
+                className="inline-flex h-10 items-center gap-2 border border-line-strong px-4 font-mono text-[10px] uppercase tracking-[0.18em] text-soft transition-colors hover:border-blood/50"
               >
                 View <ExternalLink className="size-3" />
               </Link>
@@ -68,7 +68,7 @@ export default async function EditGamePage({ params }: PageProps) {
         }
       />
 
-      <nav className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/10 pb-3">
+      <nav className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line pb-3">
         {[
           { href: "#identity", label: "Game details" },
           { href: "#chapters", label: `Chapters (${chapters.length})` },
@@ -206,7 +206,7 @@ export default async function EditGamePage({ params }: PageProps) {
           description="Shown at the end of the public archive page."
         >
           <div className="space-y-4">
-            <ul className="divide-y divide-white/[0.06] border border-white/10">
+            <ul className="divide-y divide-white/[0.06] border border-line">
               {relatedGames.length === 0 && (
                 <li className="px-4 py-4 text-[12px] text-silver/45">No related games selected.</li>
               )}
@@ -221,7 +221,7 @@ export default async function EditGamePage({ params }: PageProps) {
                       <button
                         type="submit"
                         aria-label={`Remove ${related.title}`}
-                        className="flex size-8 items-center justify-center border border-white/12 text-silver/50 transition-colors hover:border-blood/50 hover:text-blood"
+                        className="flex size-8 items-center justify-center border border-line text-silver/50 transition-colors hover:border-blood/50 hover:text-blood"
                       >
                         <Trash2 className="size-3.5" />
                       </button>
@@ -239,7 +239,7 @@ export default async function EditGamePage({ params }: PageProps) {
                   name="related_game_id"
                   required
                   defaultValue=""
-                  className="h-10 flex-1 border border-white/12 bg-void px-3 text-[12px] text-soft focus:border-blood/60 focus:outline-none"
+                  className="h-10 flex-1 border border-line bg-void px-3 text-[12px] text-soft focus:border-blood/60 focus:outline-none"
                 >
                   <option value="" disabled>
                     Choose a game to relate…
@@ -252,7 +252,7 @@ export default async function EditGamePage({ params }: PageProps) {
                 </select>
                 <button
                   type="submit"
-                  className="inline-flex h-10 items-center justify-center gap-1.5 border border-white/15 px-4 font-mono text-[9px] uppercase tracking-[0.16em] text-soft transition-colors hover:border-blood/50 hover:bg-blood/[0.06]"
+                  className="inline-flex h-10 items-center justify-center gap-1.5 border border-line-strong px-4 font-mono text-[9px] uppercase tracking-[0.16em] text-soft transition-colors hover:border-blood/50 hover:bg-blood/[0.06]"
                 >
                   <Plus className="size-3" /> Add
                 </button>

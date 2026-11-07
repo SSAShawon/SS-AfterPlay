@@ -29,7 +29,7 @@ export default async function AdminSettingsPage() {
           description="Single-administrator model. There is no registration and no way to add another administrator from this interface."
         >
           <div className="space-y-4">
-            <div className="flex items-start gap-3 border border-white/10 p-3">
+            <div className="flex items-start gap-3 border border-line p-3">
               <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[#7cc9a1]" />
               <div className="min-w-0">
                 <p className="text-[12px] text-soft">{user.email}</p>
@@ -78,7 +78,7 @@ export default async function AdminSettingsPage() {
                   <Link
                     href={link.href}
                     target="_blank"
-                    className="flex items-center justify-between border-b border-white/[0.06] py-2 text-[12px] text-silver/65 transition-colors hover:text-soft"
+                    className="flex items-center justify-between border-b border-line py-2 text-[12px] text-silver/65 transition-colors hover:text-soft"
                   >
                     {link.label}
                     <ExternalLink className="size-3" />

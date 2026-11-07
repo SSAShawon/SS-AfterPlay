@@ -45,7 +45,7 @@ function MemoryForm({ memory, games, onDone }: { memory?: Memory; games: { id: s
             id={`game-${id}`}
             name="game_id"
             defaultValue={memory?.game_id ?? ""}
-            className="mt-2 h-11 w-full border border-white/12 bg-void px-3 text-sm text-soft focus:border-blood/60 focus:outline-none"
+            className="mt-2 h-11 w-full border border-line bg-void px-3 text-sm text-soft focus:border-blood/60 focus:outline-none"
           >
             <option value="">No game</option>
             {games.map((game) => (
@@ -111,11 +111,11 @@ function MemoryForm({ memory, games, onDone }: { memory?: Memory; games: { id: s
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <label className="flex cursor-pointer items-center gap-3 border border-white/10 p-3">
+        <label className="flex cursor-pointer items-center gap-3 border border-line p-3">
           <input type="checkbox" name="featured" defaultChecked={memory?.featured} className="accent-[#D94747]" />
           <span className="text-[12px] text-soft">Featured memory</span>
         </label>
-        <label className="flex cursor-pointer items-center gap-3 border border-white/10 p-3">
+        <label className="flex cursor-pointer items-center gap-3 border border-line p-3">
           <input
             type="checkbox"
             name="is_published"
@@ -163,7 +163,7 @@ export function MemoryManager({
             setAdding((value) => !value);
             setOpenId(null);
           }}
-          className="inline-flex h-9 items-center gap-1.5 border border-white/15 px-3 font-mono text-[9px] uppercase tracking-[0.16em] text-soft transition-colors hover:border-blood/50 hover:bg-blood/[0.06]"
+          className="inline-flex h-9 items-center gap-1.5 border border-line-strong px-3 font-mono text-[9px] uppercase tracking-[0.16em] text-soft transition-colors hover:border-blood/50 hover:bg-blood/[0.06]"
         >
           {adding ? <X className="size-3" /> : <Plus className="size-3" />}
           {adding ? "Cancel" : "New memory"}
@@ -180,7 +180,7 @@ export function MemoryManager({
         {memories.map((memory, index) => {
           const isOpen = openId === memory.id;
           return (
-            <li key={memory.id} className="border border-white/10 bg-[#0b0c10]">
+            <li key={memory.id} className="border border-line bg-charcoal">
               <div className="flex flex-wrap items-center gap-3 px-4 py-3">
                 <span className="font-mono text-[9px] text-blood/60">{pad(index + 1)}</span>
                 <div className="min-w-0 flex-1">
@@ -217,7 +217,7 @@ export function MemoryManager({
                       <button
                         type="submit"
                         aria-label={`Move ${direction}`}
-                        className="flex size-8 items-center justify-center border border-white/12 text-silver/50 transition-colors hover:text-soft"
+                        className="flex size-8 items-center justify-center border border-line text-silver/50 transition-colors hover:text-soft"
                       >
                         {direction === "up" ? <ArrowUp className="size-3" /> : <ArrowDown className="size-3" />}
                       </button>
@@ -228,7 +228,7 @@ export function MemoryManager({
                     onClick={() => setOpenId(isOpen ? null : memory.id)}
                     aria-label="Edit memory"
                     className={cn(
-                      "flex size-8 items-center justify-center border border-white/12 transition-colors",
+                      "flex size-8 items-center justify-center border border-line transition-colors",
                       isOpen ? "bg-soft/[0.06] text-soft" : "text-silver/60 hover:text-soft",
                     )}
                   >
@@ -245,7 +245,7 @@ export function MemoryManager({
               </div>
 
               {isOpen && (
-                <div className="border-t border-white/10 p-4">
+                <div className="border-t border-line p-4">
                   <MemoryForm memory={memory} games={games} onDone={() => setOpenId(null)} />
                 </div>
               )}
@@ -254,7 +254,7 @@ export function MemoryManager({
         })}
 
         {memories.length === 0 && (
-          <li className="border border-dashed border-white/12 px-4 py-6 text-center text-[12px] text-silver/45">
+          <li className="border border-dashed border-line px-4 py-6 text-center text-[12px] text-silver/45">
             No memories yet.
           </li>
         )}

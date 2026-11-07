@@ -124,7 +124,7 @@ export function RankingManager({
             setAdding((value) => !value);
             setOpenId(null);
           }}
-          className="inline-flex h-9 items-center gap-1.5 border border-white/15 px-3 font-mono text-[9px] uppercase tracking-[0.16em] text-soft transition-colors hover:border-blood/50 hover:bg-blood/[0.06]"
+          className="inline-flex h-9 items-center gap-1.5 border border-line-strong px-3 font-mono text-[9px] uppercase tracking-[0.16em] text-soft transition-colors hover:border-blood/50 hover:bg-blood/[0.06]"
         >
           {adding ? <X className="size-3" /> : <Plus className="size-3" />}
           {adding ? "Cancel" : "New ranking category"}
@@ -146,8 +146,8 @@ export function RankingManager({
         const available = games.filter((game) => !alreadyRanked.has(game.id));
 
         return (
-          <section key={category.id} className="border border-white/10 bg-[#0b0c10]">
-            <header className="flex flex-wrap items-center gap-3 border-b border-white/10 px-4 py-3">
+          <section key={category.id} className="border border-line bg-charcoal">
+            <header className="flex flex-wrap items-center gap-3 border-b border-line px-4 py-3">
               <div className="min-w-0 flex-1">
                 <p className="text-[13px] text-soft">{category.title}</p>
                 <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-silver/35">
@@ -158,7 +158,7 @@ export function RankingManager({
                 type="button"
                 onClick={() => setOpenId(isOpen ? null : category.id)}
                 aria-label="Edit category"
-                className="flex size-8 items-center justify-center border border-white/12 text-silver/60 transition-colors hover:text-soft"
+                className="flex size-8 items-center justify-center border border-line text-silver/60 transition-colors hover:text-soft"
               >
                 <Pencil className="size-3.5" />
               </button>
@@ -172,7 +172,7 @@ export function RankingManager({
             </header>
 
             {isOpen && (
-              <div className="border-b border-white/10 bg-white/[0.015] p-4">
+              <div className="border-b border-line bg-white/[0.015] p-4">
                 <CategoryForm category={category} onDone={() => setOpenId(null)} />
               </div>
             )}
@@ -191,11 +191,11 @@ export function RankingManager({
                       name="note"
                       defaultValue={entry.note ?? ""}
                       placeholder="Short note…"
-                      className="h-8 w-56 border border-white/10 bg-transparent px-2 text-[11px] text-silver/70 placeholder:text-silver/25 focus:border-blood/50 focus:outline-none"
+                      className="h-8 w-56 border border-line bg-transparent px-2 text-[11px] text-silver/70 placeholder:text-silver/25 focus:border-blood/50 focus:outline-none"
                     />
                     <button
                       type="submit"
-                      className="h-8 border border-white/10 px-2 font-mono text-[8px] uppercase tracking-[0.14em] text-silver/50 hover:text-soft"
+                      className="h-8 border border-line px-2 font-mono text-[8px] uppercase tracking-[0.14em] text-silver/50 hover:text-soft"
                     >
                       Save
                     </button>
@@ -209,7 +209,7 @@ export function RankingManager({
                         <button
                           type="submit"
                           aria-label={`Move ${direction}`}
-                          className="flex size-7 items-center justify-center border border-white/12 text-silver/50 hover:text-soft"
+                          className="flex size-7 items-center justify-center border border-line text-silver/50 hover:text-soft"
                         >
                           {direction === "up" ? (
                             <ArrowUp className="size-3" />
@@ -224,7 +224,7 @@ export function RankingManager({
                       <button
                         type="submit"
                         aria-label="Remove from ranking"
-                        className="flex size-7 items-center justify-center border border-white/12 text-silver/50 hover:border-blood/50 hover:text-blood"
+                        className="flex size-7 items-center justify-center border border-line text-silver/50 hover:border-blood/50 hover:text-blood"
                       >
                         <X className="size-3" />
                       </button>
@@ -241,14 +241,14 @@ export function RankingManager({
             {available.length > 0 && (
               <form
                 action={addRankingEntryAction}
-                className="flex flex-col gap-2 border-t border-white/10 px-4 py-3 sm:flex-row"
+                className="flex flex-col gap-2 border-t border-line px-4 py-3 sm:flex-row"
               >
                 <input type="hidden" name="category_id" value={category.id} />
                 <select
                   name="game_id"
                   required
                   defaultValue=""
-                  className="h-9 flex-1 border border-white/12 bg-void px-2 text-[12px] text-soft focus:border-blood/60 focus:outline-none"
+                  className="h-9 flex-1 border border-line bg-void px-2 text-[12px] text-soft focus:border-blood/60 focus:outline-none"
                 >
                   <option value="" disabled>
                     Add a game to this ranking…
@@ -261,7 +261,7 @@ export function RankingManager({
                 </select>
                 <button
                   type="submit"
-                  className="inline-flex h-9 items-center justify-center gap-1.5 border border-white/15 px-3 font-mono text-[9px] uppercase tracking-[0.16em] text-soft hover:border-blood/50"
+                  className="inline-flex h-9 items-center justify-center gap-1.5 border border-line-strong px-3 font-mono text-[9px] uppercase tracking-[0.16em] text-soft hover:border-blood/50"
                 >
                   <Plus className="size-3" /> Add
                 </button>
@@ -272,7 +272,7 @@ export function RankingManager({
       })}
 
       {categories.length === 0 && (
-        <p className="border border-dashed border-white/12 px-4 py-6 text-center text-[12px] text-silver/45">
+        <p className="border border-dashed border-line px-4 py-6 text-center text-[12px] text-silver/45">
           No ranking categories yet.
         </p>
       )}

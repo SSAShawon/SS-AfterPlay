@@ -40,7 +40,7 @@ export function ConfirmDelete({
           <button
             type="button"
             aria-label={label}
-            className="flex size-8 items-center justify-center border border-white/12 text-silver/60 transition-colors hover:border-blood/50 hover:text-blood"
+            className="flex size-8 items-center justify-center border border-line text-silver/60 transition-colors hover:border-blood/50 hover:text-blood"
           >
             <Trash2 className="size-3.5" />
           </button>

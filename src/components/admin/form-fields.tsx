@@ -139,7 +139,7 @@ export function SelectField({
           id={name}
           name={name}
           defaultValue={defaultValue ?? ""}
-          className="h-11 w-full appearance-none border border-white/12 bg-white/[0.02] px-3.5 pr-9 text-sm text-soft transition-colors hover:border-white/20 focus:border-blood/70 focus:outline-none"
+          className="h-11 w-full appearance-none border border-line bg-charcoal px-3.5 pr-9 text-sm text-soft transition-colors hover:border-line-strong focus:border-blood/70 focus:outline-none"
         >
           {options.map((option) => (
             <option key={option.value} value={option.value} className="bg-[#0d0f13]">
@@ -167,7 +167,7 @@ export function CheckboxField({
   defaultChecked?: boolean;
 }) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 border border-white/10 bg-white/[0.015] p-3.5 transition-colors hover:border-white/20">
+    <label className="flex cursor-pointer items-start gap-3 border border-line bg-white/[0.015] p-3.5 transition-colors hover:border-line-strong">
       <input
         type="checkbox"
         name={name}
@@ -176,7 +176,7 @@ export function CheckboxField({
       />
       <span
         aria-hidden
-        className="mt-0.5 flex size-4 shrink-0 items-center justify-center border border-white/20 transition-colors peer-checked:border-blood peer-checked:bg-blood/20 peer-focus-visible:outline peer-focus-visible:outline-1 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-blood"
+        className="mt-0.5 flex size-4 shrink-0 items-center justify-center border border-line-strong transition-colors peer-checked:border-blood peer-checked:bg-blood/20 peer-focus-visible:outline peer-focus-visible:outline-1 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-blood"
       >
         <Check className="size-3 text-blood opacity-0 transition-opacity peer-checked:opacity-100" />
       </span>
@@ -324,7 +324,7 @@ export function ImageUrlField({
 
         <div
           className={cn(
-            "relative overflow-hidden border border-white/12 bg-charcoal",
+            "relative overflow-hidden border border-line bg-charcoal",
             aspect === "cover" && "aspect-[3/4]",
             aspect === "hero" && "aspect-video",
             aspect === "square" && "aspect-square",
@@ -378,7 +378,7 @@ export function MarkdownField({
     <div className="space-y-2">
       <div className="flex items-end justify-between gap-4">
         <Label htmlFor={name}>{label}</Label>
-        <div className="flex items-center border border-white/10">
+        <div className="flex items-center border border-line">
           <button
             type="button"
             onClick={() => setMode("write")}
@@ -393,7 +393,7 @@ export function MarkdownField({
             type="button"
             onClick={() => setMode("preview")}
             className={cn(
-              "flex items-center gap-1.5 border-l border-white/10 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors",
+              "flex items-center gap-1.5 border-l border-line px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors",
               mode === "preview" ? "bg-soft/[0.07] text-soft" : "text-silver/50 hover:text-soft",
             )}
           >
@@ -416,7 +416,7 @@ export function MarkdownField({
       ) : (
         <>
           <input type="hidden" name={name} value={value} />
-          <div className="min-h-32 max-w-none border border-white/12 bg-white/[0.015] p-5">
+          <div className="min-h-32 max-w-none border border-line bg-white/[0.015] p-5">
             {value.trim() ? (
               <div className="prose prose-archive max-w-none">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
@@ -449,7 +449,7 @@ export function SubmitButton({
 
   const styles = {
     primary: "bg-soft text-void hover:bg-white",
-    outlet: "border border-white/20 text-soft hover:border-blood/60 hover:bg-blood/[0.06]",
+    outlet: "border border-line-strong text-soft hover:border-blood/60 hover:bg-blood/[0.06]",
     danger: "border border-blood/40 text-blood hover:bg-blood hover:text-white",
   }[variant];
 
@@ -506,8 +506,8 @@ export function SectionCard({
   id?: string;
 }) {
   return (
-    <section id={id} className="scroll-mt-28 border border-white/10 bg-[#0b0c10]">
-      <header className="flex flex-col gap-2 border-b border-white/10 p-5 sm:flex-row sm:items-center sm:justify-between">
+    <section id={id} className="scroll-mt-28 border border-line bg-charcoal">
+      <header className="flex flex-col gap-2 border-b border-line p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="font-serif text-xl text-soft">{title}</h2>
           {description && <p className="mt-1 text-[11px] leading-relaxed text-silver/50">{description}</p>}

@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 
 import { ArchiveImage } from "@/components/public/archive-image";
 import { Markdown } from "@/components/public/markdown";
-import { MetaRow, PageHeader } from "@/components/public/primitives";
+import { MetaRow } from "@/components/public/primitives";
 import { ReadingProgress } from "@/components/public/reading-progress";
 import { getJournalPostBySlug, getLatestJournalPosts } from "@/lib/queries/journal";
 import { formatDate } from "@/lib/utils";
@@ -120,9 +120,8 @@ export default async function JournalPostPage({ params }: PageProps) {
         <div className="shell grid gap-10 py-12 md:py-16 lg:grid-cols-12 lg:gap-14">
           <aside className="lg:col-span-3">
             <div className="lg:sticky lg:top-32">
-              <p className="kicker">In this essay</p>
-              <p className="mt-3 font-serif text-[1.2rem] leading-snug text-soft">{post.title}</p>
-              <div className="mt-6 border-t border-line pt-4">
+              <p className="kicker">The essay</p>
+              <div className="mt-4 border-t border-line pt-4">
                 <p className="text-[11px] leading-relaxed text-muted">
                   Written by SS — one voice, no aggregation, no sponsored placements. Every essay
                   here is personal.
@@ -145,10 +144,13 @@ export default async function JournalPostPage({ params }: PageProps) {
             )}
 
             <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-6">
-              <p className="font-serif text-[1.35rem] italic text-soft/90">
-                The game ends. The memories don&apos;t.
+              <p className="text-[9.5px] font-medium uppercase tracking-[0.18em] text-muted">
+                Filed under {category} · {formatDate(post.published_at, "short")}
               </p>
-              <span className="text-[10px] uppercase tracking-[0.16em] text-muted">— SS</span>
+              <Link href="/journal" className="link-quiet text-[10px]">
+                Back to the journal
+                <ArrowUpRight className="size-3.5" />
+              </Link>
             </div>
           </div>
         </div>

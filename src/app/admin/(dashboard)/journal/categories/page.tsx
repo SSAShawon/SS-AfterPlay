@@ -18,7 +18,7 @@ export default async function JournalCategoriesPage() {
         actions={
           <Link
             href="/admin/journal"
-            className="inline-flex h-10 items-center border border-white/15 px-4 font-mono text-[10px] uppercase tracking-[0.18em] text-silver/70 transition-colors hover:text-soft"
+            className="inline-flex h-10 items-center border border-line-strong px-4 font-mono text-[10px] uppercase tracking-[0.18em] text-silver/70 transition-colors hover:text-soft"
           >
             Back to journal
           </Link>

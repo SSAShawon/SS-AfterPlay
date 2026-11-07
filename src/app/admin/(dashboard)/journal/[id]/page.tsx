@@ -30,7 +30,7 @@ export default async function EditJournalPage({ params }: PageProps) {
           <>
             <Link
               href="/admin/journal"
-              className="inline-flex h-10 items-center border border-white/15 px-4 font-mono text-[10px] uppercase tracking-[0.18em] text-silver/70 transition-colors hover:text-soft"
+              className="inline-flex h-10 items-center border border-line-strong px-4 font-mono text-[10px] uppercase tracking-[0.18em] text-silver/70 transition-colors hover:text-soft"
             >
               All articles
             </Link>
@@ -38,7 +38,7 @@ export default async function EditJournalPage({ params }: PageProps) {
               <Link
                 href={`/journal/${post.slug}`}
                 target="_blank"
-                className="inline-flex h-10 items-center gap-2 border border-white/15 px-4 font-mono text-[10px] uppercase tracking-[0.18em] text-soft transition-colors hover:border-blood/50"
+                className="inline-flex h-10 items-center gap-2 border border-line-strong px-4 font-mono text-[10px] uppercase tracking-[0.18em] text-soft transition-colors hover:border-blood/50"
               >
                 View <ExternalLink className="size-3" />
               </Link>

@@ -62,7 +62,7 @@ function SocialEditor({ initial }: { initial: SocialLink[] }) {
               type="button"
               onClick={() => setLinks((current) => current.filter((_, i) => i !== index))}
               aria-label="Remove link"
-              className="flex size-11 shrink-0 items-center justify-center border border-white/12 text-silver/50 transition-colors hover:border-blood/50 hover:text-blood"
+              className="flex size-11 shrink-0 items-center justify-center border border-line text-silver/50 transition-colors hover:border-blood/50 hover:text-blood"
             >
               <X className="size-3.5" />
             </button>
@@ -73,7 +73,7 @@ function SocialEditor({ initial }: { initial: SocialLink[] }) {
       <button
         type="button"
         onClick={() => setLinks((current) => [...current, { label: "", url: "" }])}
-        className="inline-flex h-9 items-center gap-1.5 border border-white/15 px-3 font-mono text-[9px] uppercase tracking-[0.16em] text-soft transition-colors hover:border-blood/50"
+        className="inline-flex h-9 items-center gap-1.5 border border-line-strong px-3 font-mono text-[9px] uppercase tracking-[0.16em] text-soft transition-colors hover:border-blood/50"
       >
         <Plus className="size-3" /> Add link
       </button>
@@ -126,7 +126,7 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
         </div>
       </SectionCard>
 
-      <div className="flex justify-end border-t border-white/10 pt-5">
+      <div className="flex justify-end border-t border-line pt-5">
         <SubmitButton label="Save settings" />
       </div>
     </form>

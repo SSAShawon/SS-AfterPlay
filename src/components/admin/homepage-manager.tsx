@@ -41,8 +41,8 @@ function SlotForm({
   const gameMode = slot === "hero" || slot === "featured_game";
 
   return (
-    <section className="border border-white/10 bg-[#0b0c10]">
-      <header className="border-b border-white/10 px-5 py-4">
+    <section className="border border-line bg-charcoal">
+      <header className="border-b border-line px-5 py-4">
         <h2 className="font-serif text-lg text-soft">{title}</h2>
         <p className="mt-1 text-[11px] leading-relaxed text-silver/50">{description}</p>
       </header>
@@ -56,7 +56,7 @@ function SlotForm({
             id={`slot-${slot}`}
             name="entity_id"
             defaultValue={currentId ?? ""}
-            className="mt-2 h-11 w-full border border-white/12 bg-void px-3 text-sm text-soft focus:border-blood/60 focus:outline-none"
+            className="mt-2 h-11 w-full border border-line bg-void px-3 text-sm text-soft focus:border-blood/60 focus:outline-none"
           >
             <option value="">— Clear this slot —</option>
             {options.map((option) => (
@@ -142,7 +142,7 @@ export function HomepageManager({
         placeholder=""
       />
 
-      <section className="border border-white/10 bg-[#0b0c10] p-5">
+      <section className="border border-line bg-charcoal p-5">
         <h2 className="font-serif text-lg text-soft">How the homepage is assembled</h2>
         <ul className="mt-3 space-y-2 text-[11px] leading-relaxed text-silver/50">
           <li>· Hero artwork and headline come from this page.</li>

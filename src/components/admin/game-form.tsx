@@ -27,7 +27,7 @@ export function GameForm({ game }: { game?: Game }) {
 
   return (
     <form action={formAction} className="space-y-5">
-      <div className="sticky top-0 z-30 -mx-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-void px-4 py-3 md:-mx-8 md:px-8">
+      <div className="sticky top-0 z-30 -mx-4 flex flex-wrap items-center justify-between gap-3 border-b border-line bg-void px-4 py-3 md:-mx-8 md:px-8">
         <div className="flex items-center gap-3">
           <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-silver/45">
             {game ? "Editing game" : "New game"}
@@ -42,7 +42,7 @@ export function GameForm({ game }: { game?: Game }) {
             <Link
               href={`/games/${game.slug}`}
               target="_blank"
-              className="inline-flex h-10 items-center gap-1.5 border border-white/12 px-3 font-mono text-[9px] uppercase tracking-[0.16em] text-silver/60 transition-colors hover:border-white/25 hover:text-soft"
+              className="inline-flex h-10 items-center gap-1.5 border border-line px-3 font-mono text-[9px] uppercase tracking-[0.16em] text-silver/60 transition-colors hover:border-white/25 hover:text-soft"
             >
               <ExternalLink className="size-3" /> View
             </Link>
@@ -274,7 +274,7 @@ export function GameForm({ game }: { game?: Game }) {
         </div>
       </SectionCard>
 
-      <div className="flex items-center justify-between border-t border-white/10 pt-5">
+      <div className="flex items-center justify-between border-t border-line pt-5">
         <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-silver/35">
           Changes publish instantly
         </p>

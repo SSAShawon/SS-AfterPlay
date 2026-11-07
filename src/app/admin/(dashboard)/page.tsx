@@ -8,7 +8,7 @@ import { formatDate } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 const KIND_STYLES = {
-  game: { label: "Game", className: "border-white/15 text-silver/60", icon: Gamepad2 },
+  game: { label: "Game", className: "border-line-strong text-silver/60", icon: Gamepad2 },
   journal: { label: "Journal", className: "border-[#8f7fd0]/35 text-[#b0a4e2]", icon: BookOpen },
   memory: { label: "Memory", className: "border-blood/35 text-[#e28b8b]", icon: Sparkles },
 } as const;
@@ -53,7 +53,7 @@ export default async function AdminDashboardPage() {
 
       <section className="grid grid-cols-2 gap-3 md:grid-cols-3">
         {cards.map((card) => (
-          <div key={card.label} className="border border-white/10 bg-[#0b0c10] p-4 md:p-5">
+          <div key={card.label} className="border border-line bg-charcoal p-4 md:p-5">
             <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-silver/45">
               {card.label}
             </p>
@@ -66,8 +66,8 @@ export default async function AdminDashboardPage() {
       </section>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
-        <section className="border border-white/10 bg-[#0b0c10] lg:col-span-2">
-          <header className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+        <section className="border border-line bg-charcoal lg:col-span-2">
+          <header className="flex items-center justify-between border-b border-line px-5 py-4">
             <h2 className="font-serif text-lg text-soft">Recent updates</h2>
             <Link
               href="/admin/games"
@@ -90,7 +90,7 @@ export default async function AdminDashboardPage() {
                 <li key={`${item.kind}-${item.id}`}>
                   <Link
                     href={item.href}
-                    className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-white/[0.02]"
+                    className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-charcoal"
                   >
                     <Icon className="size-3.5 text-silver/40" />
                     <span className="min-w-0 flex-1 truncate text-[13px] text-soft">{item.title}</span>
@@ -110,7 +110,7 @@ export default async function AdminDashboardPage() {
         </section>
 
         <aside className="space-y-4">
-          <section className="border border-white/10 bg-[#0b0c10] p-5">
+          <section className="border border-line bg-charcoal p-5">
             <h2 className="font-serif text-lg text-soft">Quick actions</h2>
             <ul className="mt-4 space-y-2">
               {[
@@ -125,7 +125,7 @@ export default async function AdminDashboardPage() {
                 <li key={action.href}>
                   <Link
                     href={action.href}
-                    className="group flex items-center justify-between border-b border-white/[0.06] py-2 text-[12px] text-silver/65 transition-colors hover:text-soft"
+                    className="group flex items-center justify-between border-b border-line py-2 text-[12px] text-silver/65 transition-colors hover:text-soft"
                   >
                     {action.label}
                     <ArrowUpRight className="size-3 text-silver/25 transition-colors group-hover:text-blood" />
@@ -135,7 +135,7 @@ export default async function AdminDashboardPage() {
             </ul>
           </section>
 
-          <section className="border border-white/10 bg-[#0b0c10] p-5">
+          <section className="border border-line bg-charcoal p-5">
             <h2 className="font-serif text-lg text-soft">Publishing rules</h2>
             <ul className="mt-3 space-y-2 text-[11px] leading-relaxed text-silver/50">
               <li>· Drafts never appear on the public site.</li>

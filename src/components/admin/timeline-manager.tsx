@@ -62,7 +62,7 @@ function EventForm({
             id={`type-${id}`}
             name="event_type"
             defaultValue={event?.event_type ?? "milestone"}
-            className="mt-2 h-11 w-full border border-white/12 bg-void px-3 text-sm text-soft focus:border-blood/60 focus:outline-none"
+            className="mt-2 h-11 w-full border border-line bg-void px-3 text-sm text-soft focus:border-blood/60 focus:outline-none"
           >
             {TIMELINE_EVENT_TYPES.map((type) => (
               <option key={type} value={type}>
@@ -77,7 +77,7 @@ function EventForm({
             id={`game-${id}`}
             name="game_id"
             defaultValue={event?.game_id ?? ""}
-            className="mt-2 h-11 w-full border border-white/12 bg-void px-3 text-sm text-soft focus:border-blood/60 focus:outline-none"
+            className="mt-2 h-11 w-full border border-line bg-void px-3 text-sm text-soft focus:border-blood/60 focus:outline-none"
           >
             <option value="">No game</option>
             {games.map((game) => (
@@ -99,7 +99,7 @@ function EventForm({
         </div>
       </div>
 
-      <label className="flex cursor-pointer items-center gap-3 border border-white/10 p-3">
+      <label className="flex cursor-pointer items-center gap-3 border border-line p-3">
         <input
           type="checkbox"
           name="is_published"
@@ -146,7 +146,7 @@ export function TimelineManager({
             setAdding((value) => !value);
             setOpenId(null);
           }}
-          className="inline-flex h-9 items-center gap-1.5 border border-white/15 px-3 font-mono text-[9px] uppercase tracking-[0.16em] text-soft transition-colors hover:border-blood/50 hover:bg-blood/[0.06]"
+          className="inline-flex h-9 items-center gap-1.5 border border-line-strong px-3 font-mono text-[9px] uppercase tracking-[0.16em] text-soft transition-colors hover:border-blood/50 hover:bg-blood/[0.06]"
         >
           {adding ? <X className="size-3" /> : <Plus className="size-3" />}
           {adding ? "Cancel" : "New event"}
@@ -163,7 +163,7 @@ export function TimelineManager({
         {events.map((event) => {
           const isOpen = openId === event.id;
           return (
-            <li key={event.id} className="border border-white/10 bg-[#0b0c10]">
+            <li key={event.id} className="border border-line bg-charcoal">
               <div className="flex flex-wrap items-center gap-3 px-4 py-3">
                 <span className="w-20 shrink-0 font-mono text-[9px] uppercase tracking-[0.12em] text-silver/40">
                   {formatDate(event.event_date, "short")}
@@ -189,7 +189,7 @@ export function TimelineManager({
                     type="button"
                     onClick={() => setOpenId(isOpen ? null : event.id)}
                     aria-label="Edit event"
-                    className="flex size-8 items-center justify-center border border-white/12 text-silver/60 transition-colors hover:text-soft"
+                    className="flex size-8 items-center justify-center border border-line text-silver/60 transition-colors hover:text-soft"
                   >
                     <Pencil className="size-3.5" />
                   </button>
@@ -204,7 +204,7 @@ export function TimelineManager({
               </div>
 
               {isOpen && (
-                <div className="border-t border-white/10 p-4">
+                <div className="border-t border-line p-4">
                   <EventForm event={event} games={games} onDone={() => setOpenId(null)} />
                 </div>
               )}
@@ -213,7 +213,7 @@ export function TimelineManager({
         })}
 
         {events.length === 0 && (
-          <li className="border border-dashed border-white/12 px-4 py-6 text-center text-[12px] text-silver/45">
+          <li className="border border-dashed border-line px-4 py-6 text-center text-[12px] text-silver/45">
             No timeline events yet.
           </li>
         )}

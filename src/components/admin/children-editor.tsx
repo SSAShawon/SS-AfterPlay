@@ -74,7 +74,7 @@ export function ChildrenEditor({
             "inline-flex h-9 items-center gap-1.5 border px-3 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors",
             adding
               ? "border-blood/50 text-blood"
-              : "border-white/15 text-soft hover:border-blood/50 hover:bg-blood/[0.06]",
+              : "border-line-strong text-soft hover:border-blood/50 hover:bg-blood/[0.06]",
           )}
         >
           {adding ? <X className="size-3" /> : <Plus className="size-3" />}
@@ -99,7 +99,7 @@ export function ChildrenEditor({
       )}
 
       {items.length === 0 && !adding && (
-        <p className="border border-dashed border-white/12 px-4 py-6 text-center text-[12px] text-silver/45">
+        <p className="border border-dashed border-line px-4 py-6 text-center text-[12px] text-silver/45">
           No {plural.toLowerCase()} yet.
         </p>
       )}
@@ -112,7 +112,7 @@ export function ChildrenEditor({
           const subtitle = subtitleField ? String(record[subtitleField] ?? "") : "";
 
           return (
-            <li key={item.id} className="border border-white/10 bg-[#0b0c10]">
+            <li key={item.id} className="border border-line bg-charcoal">
               <div className="flex items-center gap-3 px-4 py-3">
                 <span className="font-mono text-[9px] text-blood/60">{pad(index + 1)}</span>
                 <div className="min-w-0 flex-1">
@@ -135,7 +135,7 @@ export function ChildrenEditor({
                     type="button"
                     onClick={() => setOpenId(isOpen ? null : item.id)}
                     aria-label={isOpen ? "Close editor" : "Edit"}
-                    className="flex size-8 items-center justify-center border border-white/12 text-silver/60 transition-colors hover:border-white/25 hover:text-soft"
+                    className="flex size-8 items-center justify-center border border-line text-silver/60 transition-colors hover:border-white/25 hover:text-soft"
                   >
                     {isOpen ? <ChevronDown className="size-3.5" /> : <Pencil className="size-3.5" />}
                   </button>
@@ -151,7 +151,7 @@ export function ChildrenEditor({
               </div>
 
               {isOpen && (
-                <div className="border-t border-white/10 p-4">
+                <div className="border-t border-line p-4">
                   <ChildForm
                     kind={kind}
                     gameId={gameId}
@@ -194,7 +194,7 @@ function MoveButton({
       <button
         type="submit"
         aria-label={`Move ${direction}`}
-        className="flex size-8 items-center justify-center border border-white/12 text-silver/50 transition-colors hover:border-white/25 hover:text-soft"
+        className="flex size-8 items-center justify-center border border-line text-silver/50 transition-colors hover:border-white/25 hover:text-soft"
       >
         {direction === "up" ? <ArrowUp className="size-3" /> : <ArrowDown className="size-3" />}
       </button>

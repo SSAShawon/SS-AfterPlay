@@ -4,13 +4,12 @@ import { ArrowUpRight } from "lucide-react";
 import { ArchiveImage } from "@/components/public/archive-image";
 import { MetaRow, Rating, StatusBadge } from "@/components/public/primitives";
 import { formatDate, pad } from "@/lib/utils";
+import { GAME_STATUS_LABELS } from "@/lib/types";
 import type {
   GameCardData,
   JournalPostWithCategory,
   MemoryWithGame,
 } from "@/lib/types";
-
-const NOUNS = ["cover", "art"];
 
 export function GameCoverCard({
   game,
@@ -26,12 +25,17 @@ export function GameCoverCard({
       <div className="frame border border-line transition-colors duration-200 group-hover:border-line-strong">
         <ArchiveImage
           src={game.cover_url}
-          alt={`${game.title} ${NOUNS.join(" ")}`}
+          alt={`${game.title} cover art`}
           fallbackLabel={game.title}
           priority={priority}
           sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 20vw"
           className="aspect-[3/4] w-full"
         />
+        {game.status !== "completed" && (
+          <span className="absolute left-0 top-0 bg-void/85 px-2 py-1 text-[9px] font-medium uppercase tracking-[0.16em] text-silver">
+            {GAME_STATUS_LABELS[game.status]}
+          </span>
+        )}
       </div>
 
       <div className="mt-3 flex items-start justify-between gap-3 border-t border-line pt-2.5">

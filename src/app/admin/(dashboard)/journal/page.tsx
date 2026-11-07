@@ -49,7 +49,7 @@ export default async function AdminJournalPage({ searchParams }: PageProps) {
             name="q"
             defaultValue={params.q ?? ""}
             placeholder="Search articles…"
-            className="h-10 w-full border border-white/12 bg-white/[0.02] pl-9 pr-3 text-sm text-soft placeholder:text-silver/40 focus:border-blood/60 focus:outline-none"
+            className="h-10 w-full border border-line bg-charcoal pl-9 pr-3 text-sm text-soft placeholder:text-silver/40 focus:border-blood/60 focus:outline-none"
           />
         </form>
 
@@ -77,8 +77,8 @@ export default async function AdminJournalPage({ searchParams }: PageProps) {
         </p>
       )}
 
-      <div className="border border-white/10 bg-[#0b0c10]">
-        <div className="hidden grid-cols-[1fr_130px_110px_120px_130px] gap-3 border-b border-white/10 px-4 py-2.5 font-mono text-[8.5px] uppercase tracking-[0.16em] text-silver/40 md:grid">
+      <div className="border border-line bg-charcoal">
+        <div className="hidden grid-cols-[1fr_130px_110px_120px_130px] gap-3 border-b border-line px-4 py-2.5 font-mono text-[8.5px] uppercase tracking-[0.16em] text-silver/40 md:grid">
           <span>Title</span>
           <span>Category</span>
           <span>State</span>
@@ -139,7 +139,7 @@ export default async function AdminJournalPage({ searchParams }: PageProps) {
                 <Link
                   href={`/admin/journal/${post.id}`}
                   aria-label="Edit article"
-                  className="flex size-8 items-center justify-center border border-white/12 text-silver/60 transition-colors hover:border-white/25 hover:text-soft"
+                  className="flex size-8 items-center justify-center border border-line text-silver/60 transition-colors hover:border-white/25 hover:text-soft"
                 >
                   <Pencil className="size-3.5" />
                 </Link>

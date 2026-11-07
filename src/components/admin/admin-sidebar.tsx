@@ -51,8 +51,8 @@ export function AdminSidebar({ email }: { email: string }) {
             className={cn(
               "flex items-center gap-3 border-l px-4 py-2.5 text-[12px] transition-colors",
               isActive(item)
-                ? "border-blood bg-white/[0.04] text-soft"
-                : "border-transparent text-silver/60 hover:border-white/20 hover:text-soft",
+                ? "border-blood bg-ink text-soft"
+                : "border-transparent text-silver/60 hover:border-line-strong hover:text-soft",
             )}
           >
             <Icon className="size-3.5" />
@@ -66,7 +66,7 @@ export function AdminSidebar({ email }: { email: string }) {
   return (
     <>
       {/* mobile top bar */}
-      <div className="sticky top-0 z-50 flex items-center justify-between border-b border-white/10 bg-void px-4 py-3 lg:hidden">
+      <div className="sticky top-0 z-50 flex items-center justify-between border-b border-line bg-void px-4 py-3 lg:hidden">
         <Link href="/admin" className="display text-lg tracking-[0.2em]">
           SS · Admin
         </Link>
@@ -74,14 +74,14 @@ export function AdminSidebar({ email }: { email: string }) {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Open admin menu"
-          className="flex size-9 items-center justify-center border border-white/12 text-silver"
+          className="flex size-9 items-center justify-center border border-line text-silver"
         >
           <Menu className="size-4" />
         </button>
       </div>
 
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[248px] flex-col border-r border-white/10 bg-[#0a0b0e] lg:flex">
-        <div className="border-b border-white/10 px-5 py-5">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[248px] flex-col border-r border-line bg-[#0a0b0e] lg:flex">
+        <div className="border-b border-line px-5 py-5">
           <Link href="/" className="flex items-baseline gap-2">
             <span className="display text-xl tracking-[0.2em] text-soft">SS</span>
             <span className="font-mono text-[8px] uppercase tracking-[0.28em] text-silver/50">
@@ -92,7 +92,7 @@ export function AdminSidebar({ email }: { email: string }) {
 
         <div className="flex-1 overflow-y-auto py-4">{nav}</div>
 
-        <div className="border-t border-white/10 p-4">
+        <div className="border-t border-line p-4">
           <p className="truncate font-mono text-[9px] uppercase tracking-[0.16em] text-silver/40">
             {email}
           </p>
@@ -100,14 +100,14 @@ export function AdminSidebar({ email }: { email: string }) {
             <Link
               href="/"
               target="_blank"
-              className="flex flex-1 items-center justify-center gap-1.5 border border-white/12 py-2 font-mono text-[9px] uppercase tracking-[0.16em] text-silver/70 transition-colors hover:border-white/25 hover:text-soft"
+              className="flex flex-1 items-center justify-center gap-1.5 border border-line py-2 font-mono text-[9px] uppercase tracking-[0.16em] text-silver/70 transition-colors hover:border-white/25 hover:text-soft"
             >
               <ExternalLink className="size-3" /> Site
             </Link>
             <form action={signOutAction} className="flex-1">
               <button
                 type="submit"
-                className="flex w-full items-center justify-center gap-1.5 border border-white/12 py-2 font-mono text-[9px] uppercase tracking-[0.16em] text-silver/70 transition-colors hover:border-blood/50 hover:text-blood"
+                className="flex w-full items-center justify-center gap-1.5 border border-line py-2 font-mono text-[9px] uppercase tracking-[0.16em] text-silver/70 transition-colors hover:border-blood/50 hover:text-blood"
               >
                 <LogOut className="size-3" /> Sign out
               </button>
@@ -124,26 +124,26 @@ export function AdminSidebar({ email }: { email: string }) {
         )}
         aria-hidden={!open}
       >
-        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+        <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <span className="display text-lg tracking-[0.2em]">SS · Admin</span>
           <button
             type="button"
             onClick={() => setOpen(false)}
             aria-label="Close admin menu"
-            className="flex size-9 items-center justify-center border border-white/12 text-silver"
+            className="flex size-9 items-center justify-center border border-line text-silver"
           >
             <X className="size-4" />
           </button>
         </div>
         <div className="py-4">{nav}</div>
-        <div className="border-t border-white/10 p-4">
+        <div className="border-t border-line p-4">
           <p className="truncate font-mono text-[9px] uppercase tracking-[0.16em] text-silver/40">
             {email}
           </p>
           <form action={signOutAction} className="mt-3">
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 border border-white/12 py-2.5 font-mono text-[9px] uppercase tracking-[0.16em] text-silver/70"
+              className="flex w-full items-center justify-center gap-2 border border-line py-2.5 font-mono text-[9px] uppercase tracking-[0.16em] text-silver/70"
             >
               <LogOut className="size-3" /> Sign out
             </button>

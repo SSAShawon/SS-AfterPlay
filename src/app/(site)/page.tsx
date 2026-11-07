@@ -397,11 +397,7 @@ export default async function HomePage() {
                     key={game.id}
                     href={`/games/${game.slug}`}
                     className={
-                      wide
-                        ? "group block lg:col-span-5 lg:row-span-2"
-                        : medium
-                          ? "group block lg:col-span-4"
-                          : "group block lg:col-span-3"
+                      wide || medium ? "group block lg:col-span-4" : "group block lg:col-span-3"
                     }
                   >
                     <div className="frame border border-line transition-colors duration-200 group-hover:border-line-strong">
@@ -410,11 +406,7 @@ export default async function HomePage() {
                         alt={`${game.title} cover art`}
                         fallbackLabel={game.title}
                         sizes={wide ? "(max-width: 1024px) 100vw, 40vw" : "(max-width: 1024px) 50vw, 22vw"}
-                        className={
-                          wide
-                            ? "aspect-[3/4] w-full lg:aspect-[4/5]"
-                            : "aspect-[3/4] w-full"
-                        }
+                        className="aspect-[3/4] w-full"
                       />
                     </div>
                     <div className="mt-3 flex items-start justify-between gap-3 border-t border-line pt-2.5">

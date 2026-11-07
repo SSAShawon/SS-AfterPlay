@@ -37,7 +37,7 @@ export function FlagToggle({
           "inline-flex items-center gap-1.5 border px-2 py-1 font-mono text-[8.5px] uppercase tracking-[0.14em] transition-colors",
           value
             ? "border-[#4fa87a]/40 bg-[#4fa87a]/[0.07] text-[#7cc9a1] hover:border-[#4fa87a]/70"
-            : "border-white/15 text-silver/50 hover:border-white/30 hover:text-soft",
+            : "border-line-strong text-silver/50 hover:border-white/30 hover:text-soft",
           className,
         )}
       >
