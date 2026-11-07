@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BookOpen, Flag, Gamepad2, Milestone, Sparkles } from "lucide-react";
 
 import { EmptyState, PageHeader } from "@/components/public/primitives";
 import { getTimeline, getTimelineYears } from "@/lib/queries/timeline";
@@ -19,14 +18,6 @@ export const metadata: Metadata = {
   },
 };
 
-const TYPE_ICONS: Record<TimelineEventType, React.ReactNode> = {
-  game_started: <Gamepad2 className="size-3.5" />,
-  game_completed: <Flag className="size-3.5" />,
-  milestone: <Milestone className="size-3.5" />,
-  journal: <BookOpen className="size-3.5" />,
-  other: <Sparkles className="size-3.5" />,
-};
-
 interface PageProps {
   searchParams: Promise<{ year?: string; type?: string }>;
 }
@@ -42,6 +33,22 @@ export default async function TimelinePage({ searchParams }: PageProps) {
 
   const grouped = groupByYear(events);
 
+  const typeHref = (value: TimelineEventType | "all") => {
+    const search = new URLSearchParams();
+    if (value !== "all") search.set("type", value);
+    if (params.year) search.set("year", params.year);
+    const query = search.toString();
+    return query ? `/timeline?${query}` : "/timeline";
+  };
+
+  const yearHref = (value?: string) => {
+    const search = new URLSearchParams();
+    if (type !== "all") search.set("type", type);
+    if (value) search.set("year", value);
+    const query = search.toString();
+    return query ? `/timeline?${query}` : "/timeline";
+  };
+
   return (
     <>
       <PageHeader
@@ -54,14 +61,14 @@ export default async function TimelinePage({ searchParams }: PageProps) {
         ]}
       />
 
-      <section className="sticky top-[68px] z-40 border-b border-white/10 bg-void/92 backdrop-blur-xl md:top-[78px]">
-        <div className="shell flex flex-col gap-3 py-4 lg:flex-row lg:items-center lg:justify-between">
-          <nav className="scrollbar-none flex items-center gap-1 overflow-x-auto" aria-label="Filter by event type">
+      <div className="sticky top-[62px] z-40 border-b border-line bg-void md:top-[72px]">
+        <div className="shell flex flex-col gap-3 py-3 lg:flex-row lg:items-center lg:justify-between">
+          <nav className="scrollbar-none flex items-center gap-5 overflow-x-auto" aria-label="Filter by event type">
             <Link
-              href={`/timeline${params.year ? `?year=${params.year}` : ""}`}
+              href={typeHref("all")}
               className={cn(
-                "shrink-0 border-b px-3 py-2 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors",
-                type === "all" ? "border-blood text-soft" : "border-transparent text-silver/50 hover:text-soft",
+                "shrink-0 border-b py-0.5 text-[9.5px] font-medium uppercase tracking-[0.16em] transition-colors",
+                type === "all" ? "border-blood text-soft" : "border-transparent text-muted hover:text-soft",
               )}
             >
               All events
@@ -69,12 +76,10 @@ export default async function TimelinePage({ searchParams }: PageProps) {
             {(Object.keys(TIMELINE_EVENT_LABELS) as TimelineEventType[]).map((eventType) => (
               <Link
                 key={eventType}
-                href={`/timeline?type=${eventType}${params.year ? `&year=${params.year}` : ""}`}
+                href={typeHref(eventType)}
                 className={cn(
-                  "shrink-0 border-b px-3 py-2 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors",
-                  type === eventType
-                    ? "border-blood text-soft"
-                    : "border-transparent text-silver/50 hover:text-soft",
+                  "shrink-0 border-b py-0.5 text-[9.5px] font-medium uppercase tracking-[0.16em] transition-colors",
+                  type === eventType ? "border-blood text-soft" : "border-transparent text-muted hover:text-soft",
                 )}
               >
                 {TIMELINE_EVENT_LABELS[eventType]}
@@ -82,14 +87,12 @@ export default async function TimelinePage({ searchParams }: PageProps) {
             ))}
           </nav>
 
-          <div className="scrollbar-none flex items-center gap-1 overflow-x-auto">
+          <div className="scrollbar-none flex items-center gap-4 overflow-x-auto">
             <Link
-              href={`/timeline${type !== "all" ? `?type=${type}` : ""}`}
+              href={yearHref()}
               className={cn(
-                "shrink-0 border px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors",
-                !params.year
-                  ? "border-white/20 text-soft"
-                  : "border-transparent text-silver/50 hover:text-soft",
+                "shrink-0 text-[9.5px] font-medium uppercase tracking-[0.16em] transition-colors",
+                !params.year ? "text-soft" : "text-muted hover:text-soft",
               )}
             >
               All years
@@ -97,12 +100,10 @@ export default async function TimelinePage({ searchParams }: PageProps) {
             {years.map((year) => (
               <Link
                 key={year}
-                href={`/timeline?year=${year}${type !== "all" ? `&type=${type}` : ""}`}
+                href={yearHref(year)}
                 className={cn(
-                  "shrink-0 border px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors",
-                  params.year === year
-                    ? "border-blood/60 text-soft"
-                    : "border-transparent text-silver/50 hover:text-soft",
+                  "shrink-0 text-[9.5px] tabular-nums tracking-[0.12em] transition-colors",
+                  params.year === year ? "text-soft" : "text-muted hover:text-soft",
                 )}
               >
                 {year}
@@ -110,9 +111,9 @@ export default async function TimelinePage({ searchParams }: PageProps) {
             ))}
           </div>
         </div>
-      </section>
+      </div>
 
-      <section className="shell py-14 md:py-20">
+      <section className="shell py-10 md:py-14">
         {grouped.length === 0 ? (
           <EmptyState
             title="No events match those filters."
@@ -120,60 +121,55 @@ export default async function TimelinePage({ searchParams }: PageProps) {
             action={{ href: "/timeline", label: "Show everything" }}
           />
         ) : (
-          <div className="space-y-16 md:space-y-24">
+          <div className="space-y-14 md:space-y-20">
             {grouped.map(([year, yearEvents]) => (
-              <section key={year} className="grid gap-8 lg:grid-cols-12">
+              <section key={year} className="grid gap-6 lg:grid-cols-12 lg:gap-12">
                 <div className="lg:col-span-3">
-                  <div className="sticky top-36">
-                    <h2 className="display text-[clamp(2.6rem,6vw,4.4rem)] leading-none text-white/20">
+                  <div className="lg:sticky lg:top-32">
+                    <h2 className="font-serif text-[clamp(2.4rem,5.4vw,4rem)] leading-none text-soft">
                       {year}
                     </h2>
-                    <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.22em] text-silver/40">
-                      {yearEvents.length} event{yearEvents.length === 1 ? "" : "s"}
+                    <p className="mt-2 text-[9.5px] uppercase tracking-[0.18em] text-muted">
+                      {yearEvents.length} {yearEvents.length === 1 ? "event" : "events"}
                     </p>
+                    <span className="mt-4 block h-px w-10 bg-blood" aria-hidden />
                   </div>
                 </div>
 
-                <div className="relative lg:col-span-9">
-                  <span
-                    aria-hidden
-                    className="absolute bottom-0 left-[7px] top-2 w-px bg-gradient-to-b from-blood/40 via-white/10 to-transparent"
-                  />
-                  <ol className="space-y-8">
+                <div className="lg:col-span-9">
+                  <ol className="border-t border-line">
                     {yearEvents.map((event) => (
-                      <li key={event.id} className="relative pl-8">
-                        <span className="absolute left-0 top-2 flex size-[15px] items-center justify-center border border-white/20 bg-void text-blood">
-                          {TYPE_ICONS[event.event_type]}
-                        </span>
-
-                        <div className="border-b border-white/[0.07] pb-6">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-silver/40">
+                      <li key={event.id} className="border-b border-line py-5">
+                        <div className="grid gap-3 sm:grid-cols-[7rem_1fr] sm:gap-6">
+                          <div>
+                            <p className="text-[10px] uppercase tracking-[0.14em] text-soft">
                               {formatDate(event.event_date, "short")}
-                            </span>
-                            <span className="border border-white/12 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.16em] text-silver/55">
+                            </p>
+                            <p className="mt-1 text-[9px] uppercase tracking-[0.16em] text-muted">
                               {TIMELINE_EVENT_LABELS[event.event_type]}
-                            </span>
+                            </p>
                           </div>
 
-                          <h3 className="mt-2 font-serif text-xl text-soft md:text-2xl">
-                            {event.title}
-                          </h3>
+                          <div>
+                            <h3 className="font-serif text-[1.4rem] leading-tight text-soft md:text-[1.6rem]">
+                              {event.title}
+                            </h3>
 
-                          {event.description && (
-                            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-silver/70">
-                              {event.description}
-                            </p>
-                          )}
+                            {event.description && (
+                              <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-silver">
+                                {event.description}
+                              </p>
+                            )}
 
-                          {event.games && (
-                            <Link
-                              href={`/games/${event.games.slug}`}
-                              className="mt-3 inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.18em] text-blood/70 transition-colors hover:text-blood"
-                            >
-                              {event.games.title}
-                            </Link>
-                          )}
+                            {event.games && (
+                              <Link
+                                href={`/games/${event.games.slug}`}
+                                className="mt-3 inline-flex items-baseline gap-2 border-b border-line pb-0.5 text-[10px] uppercase tracking-[0.14em] text-silver transition-colors hover:border-blood hover:text-soft"
+                              >
+                                {event.games.title}
+                              </Link>
+                            )}
+                          </div>
                         </div>
                       </li>
                     ))}

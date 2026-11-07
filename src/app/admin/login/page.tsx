@@ -5,49 +5,50 @@ import { LoginForm } from "@/components/admin/login-form";
 
 export default function AdminLoginPage() {
   return (
-    <div className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-5 py-12">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(55% 45% at 50% 20%, rgba(217,71,71,0.10), transparent 65%), linear-gradient(to bottom, #08090C, #0b0c10)",
-        }}
-      />
-      <div aria-hidden className="pointer-events-none absolute inset-0 grain" />
-
-      <div className="relative w-full max-w-md">
+    <div className="flex min-h-dvh flex-col">
+      <div className="shell flex h-[62px] items-center justify-between border-b border-line">
+        <Link href="/" className="flex items-baseline gap-2.5">
+          <span className="font-serif text-[1.5rem] leading-none text-soft">SS</span>
+          <span className="text-[9.5px] font-medium uppercase tracking-[0.34em] text-silver">
+            Afterplay
+          </span>
+        </Link>
         <Link
           href="/"
-          className="group mb-10 inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.22em] text-silver/50 transition-colors hover:text-soft"
+          className="flex items-center gap-2 text-[9.5px] font-medium uppercase tracking-[0.18em] text-muted transition-colors hover:text-soft"
         >
-          <ArrowLeft className="size-3 transition-transform duration-500 group-hover:-translate-x-1" />
+          <ArrowLeft className="size-3" />
           Back to the archive
         </Link>
+      </div>
 
-        <div className="border border-white/10 bg-[#0b0c10]/90 p-7 shadow-[0_40px_120px_-50px_rgba(0,0,0,0.9)] backdrop-blur">
+      <div className="shell flex flex-1 items-center justify-center py-12">
+        <div className="w-full max-w-sm">
           <div className="flex items-center gap-3">
-            <span className="display text-2xl tracking-[0.18em] text-soft">SS</span>
-            <span className="h-px flex-1 bg-white/10" />
-            <ShieldCheck className="size-4 text-blood/70" />
+            <span className="archivedot" aria-hidden />
+            <p className="kicker">Control room</p>
           </div>
 
-          <h1 className="display mt-6 text-3xl text-soft">Archive control room</h1>
-          <p className="mt-2 text-xs leading-relaxed text-silver/60">
-            Single-administrator access. There is no registration, no social login and no guest
-            entry.
+          <h1 className="display mt-4 text-[2.1rem] leading-tight text-soft">
+            Sign in to the archive
+          </h1>
+          <p className="mt-3 text-[12.5px] leading-relaxed text-muted">
+            Single-administrator access. No registration, no social login, no guest entry.
           </p>
 
-          <div className="mt-7">
+          <div className="mt-8 border-t border-line pt-7">
             <LoginForm />
           </div>
 
-          <p className="mt-6 border-t border-white/10 pt-4 font-mono text-[9px] uppercase leading-relaxed tracking-[0.18em] text-silver/35">
-            Unauthorised access attempts are rejected server-side.
+          <p className="mt-7 flex items-center gap-2 border-t border-line pt-4 text-[9px] uppercase tracking-[0.16em] text-muted">
+            <ShieldCheck className="size-3.5" />
+            Unauthorised attempts are rejected server-side
           </p>
         </div>
+      </div>
 
-        <p className="mt-6 text-center font-serif text-sm italic text-silver/40">
+      <div className="shell flex h-[62px] items-center border-t border-line">
+        <p className="text-[9px] uppercase tracking-[0.24em] text-muted/70">
           The game ends. The memories don&apos;t.
         </p>
       </div>

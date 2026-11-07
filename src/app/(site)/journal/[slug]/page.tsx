@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, Clock } from "lucide-react";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
 
 import { ArchiveImage } from "@/components/public/archive-image";
 import { Markdown } from "@/components/public/markdown";
-import { MetaRow } from "@/components/public/primitives";
+import { MetaRow, PageHeader } from "@/components/public/primitives";
 import { ReadingProgress } from "@/components/public/reading-progress";
 import { getJournalPostBySlug, getLatestJournalPosts } from "@/lib/queries/journal";
-import { formatDate, pad } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -42,123 +42,148 @@ export default async function JournalPostPage({ params }: PageProps) {
   if (!post) notFound();
 
   const related = latest.filter((item) => item.id !== post.id).slice(0, 3);
+  const category = post.journal_categories?.name ?? "Essay";
 
   return (
     <>
       <ReadingProgress />
 
       <article>
-        <header className="relative isolate overflow-hidden border-b border-white/10">
-          <div className="absolute inset-0">
-            <ArchiveImage
-              src={post.cover_url}
-              alt={post.title}
-              fallbackLabel={post.title}
-              priority
-              className="size-full"
-            />
-            <div className="absolute inset-0 bg-[radial-gradient(120%_100%_at_50%_0%,rgba(8,9,12,0.45),rgba(8,9,12,0.88)_60%,#08090C_100%)]" />
-            <div className="absolute inset-0 grain" />
-          </div>
-
-          <div className="shell relative pb-14 pt-32 md:pb-20 md:pt-40">
+        <header className="border-b border-line pb-10 pt-32 md:pb-14 md:pt-40">
+          <div className="shell">
             <Link
               href="/journal"
-              className="group inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.22em] text-silver/60 transition-colors hover:text-soft"
+              className="inline-flex items-center gap-2 text-[9.5px] font-medium uppercase tracking-[0.2em] text-muted transition-colors hover:text-soft"
             >
-              <ArrowLeft className="size-3 transition-transform duration-500 group-hover:-translate-x-1" />
+              <ArrowLeft className="size-3" />
               The journal
             </Link>
 
-            <div className="mt-8 max-w-3xl">
-              <MetaRow
-                items={[
-                  post.journal_categories?.name ?? "Essay",
-                  formatDate(post.published_at),
-                  `${post.reading_minutes ?? 5} min read`,
-                ]}
-              />
-              <h1 className="display mt-5 text-[clamp(2.3rem,6vw,4.6rem)] text-soft text-shadow-cinema">
-                {post.title}
-              </h1>
-              {post.excerpt && (
-                <p className="mt-5 max-w-2xl font-serif text-xl italic leading-relaxed text-silver/85">
-                  {post.excerpt}
-                </p>
-              )}
+            <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:gap-12">
+              <div className="lg:col-span-9">
+                <MetaRow
+                  items={[
+                    category,
+                    formatDate(post.published_at),
+                    `${post.reading_minutes ?? 5} min read`,
+                  ]}
+                />
+                <h1 className="display mt-5 max-w-[22ch] text-[clamp(2.3rem,5.6vw,4.6rem)] text-soft">
+                  {post.title}
+                </h1>
+                {post.excerpt && (
+                  <p className="mt-6 max-w-2xl font-serif text-[clamp(1.15rem,2vw,1.5rem)] italic leading-snug text-silver">
+                    {post.excerpt}
+                  </p>
+                )}
+              </div>
+
+              <div className="lg:col-span-3 lg:pt-2">
+                <dl className="border-t border-line">
+                  {[
+                    { label: "Filed under", value: category },
+                    { label: "Published", value: formatDate(post.published_at, "short") },
+                    { label: "Reading time", value: `${post.reading_minutes ?? 5} minutes` },
+                    { label: "Written by", value: "SS" },
+                  ].map((item) => (
+                    <div
+                      key={item.label}
+                      className="flex items-baseline justify-between gap-4 border-b border-line py-2.5"
+                    >
+                      <dt className="text-[9px] font-medium uppercase tracking-[0.16em] text-muted">
+                        {item.label}
+                      </dt>
+                      <dd className="text-right text-[12px] text-soft">{item.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
             </div>
           </div>
         </header>
 
-        <div className="shell grid gap-12 py-14 md:py-20 lg:grid-cols-12">
+        {post.cover_url && (
+          <div className="shell pt-8 md:pt-10">
+            <div className="frame border border-line">
+              <ArchiveImage
+                src={post.cover_url}
+                alt={post.title}
+                fallbackLabel={post.title}
+                priority
+                sizes="100vw"
+                className="aspect-[16/9] w-full md:aspect-[21/9]"
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="shell grid gap-10 py-12 md:py-16 lg:grid-cols-12 lg:gap-14">
           <aside className="lg:col-span-3">
-            <div className="sticky top-32 space-y-6">
-              <div>
-                <p className="eyebrow">Filed under</p>
-                <p className="mt-2 font-serif text-xl text-soft">
-                  {post.journal_categories?.name ?? "Essay"}
+            <div className="lg:sticky lg:top-32">
+              <p className="kicker">In this essay</p>
+              <p className="mt-3 font-serif text-[1.2rem] leading-snug text-soft">{post.title}</p>
+              <div className="mt-6 border-t border-line pt-4">
+                <p className="text-[11px] leading-relaxed text-muted">
+                  Written by SS — one voice, no aggregation, no sponsored placements. Every essay
+                  here is personal.
                 </p>
               </div>
-              <div>
-                <p className="eyebrow">Published</p>
-                <p className="mt-2 text-sm text-silver/70">{formatDate(post.published_at) ?? "—"}</p>
-              </div>
-              <div>
-                <p className="eyebrow">Reading time</p>
-                <p className="mt-2 flex items-center gap-2 text-sm text-silver/70">
-                  <Clock className="size-3.5" /> {post.reading_minutes ?? 5} minutes
-                </p>
-              </div>
-              <div className="border-t border-white/10 pt-4">
-                <p className="font-mono text-[9px] uppercase leading-relaxed tracking-[0.18em] text-silver/40">
-                  Written by SS
-                  <br />
-                  Personal archive · 001
-                </p>
-              </div>
+              <Link href="/journal" className="link-quiet mt-6">
+                More essays
+                <ArrowUpRight className="size-3.5" />
+              </Link>
             </div>
           </aside>
 
-          <div className="lg:col-span-9">
-            <Markdown content={post.content} className="prose-archive max-w-[68ch]" />
+          <div className="lg:col-span-8 lg:col-start-5">
+            {post.content ? (
+              <div className="prose-archive dropcap">
+                <Markdown content={post.content} />
+              </div>
+            ) : (
+              <p className="text-[13.5px] text-muted">This essay has no body text yet.</p>
+            )}
 
-            <div className="mt-16 border-t border-white/10 pt-6">
-              <p className="font-serif text-2xl italic text-silver/60">
+            <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-6">
+              <p className="font-serif text-[1.35rem] italic text-soft/90">
                 The game ends. The memories don&apos;t.
               </p>
+              <span className="text-[10px] uppercase tracking-[0.16em] text-muted">— SS</span>
             </div>
           </div>
         </div>
       </article>
 
       {related.length > 0 && (
-        <section className="border-t border-white/10 py-16 md:py-20">
+        <section className="border-t border-line py-12 md:py-16">
           <div className="shell">
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-[10px] text-blood/80">{pad(2)}</span>
-              <span className="h-px w-8 bg-white/20" />
-              <span className="eyebrow">Keep reading</span>
+            <div className="flex items-baseline justify-between border-b border-line pb-3">
+              <h2 className="kicker">Keep reading</h2>
+              <Link href="/journal" className="link-quiet text-[10px]">
+                All essays
+                <ArrowUpRight className="size-3.5" />
+              </Link>
             </div>
 
-            <div className="mt-8 grid gap-8 sm:grid-cols-3">
+            <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((item) => (
-                <Link key={item.id} href={`/journal/${item.slug}`} className="group">
-                  <ArchiveImage
-                    src={item.cover_url}
-                    alt={item.title}
-                    fallbackLabel={item.title}
-                    className="aspect-[16/10] w-full border border-white/10"
-                  />
+                <Link key={item.id} href={`/journal/${item.slug}`} className="group block">
+                  <div className="frame border border-line transition-colors duration-200 group-hover:border-line-strong">
+                    <ArchiveImage
+                      src={item.cover_url}
+                      alt={item.title}
+                      fallbackLabel={item.title}
+                      sizes="(max-width: 768px) 100vw, 32vw"
+                      className="aspect-[4/3] w-full"
+                    />
+                  </div>
                   <MetaRow
                     className="mt-3"
-                    items={[item.journal_categories?.name, `${item.reading_minutes ?? 5} min read`]}
+                    items={[item.journal_categories?.name ?? "Essay", formatDate(item.published_at, "short")]}
                   />
-                  <h2 className="mt-2 font-serif text-xl leading-snug text-soft transition-colors group-hover:text-white">
+                  <h3 className="mt-2 font-serif text-[1.3rem] leading-tight text-soft transition-colors group-hover:text-white">
                     {item.title}
-                  </h2>
-                  <span className="mt-2 inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.18em] text-silver/50 group-hover:text-blood">
-                    Read <ArrowUpRight className="size-3" />
-                  </span>
+                  </h3>
                 </Link>
               ))}
             </div>

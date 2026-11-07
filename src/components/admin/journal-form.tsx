@@ -34,7 +34,7 @@ export function JournalForm({
 
   return (
     <form action={formAction} className="space-y-5">
-      <div className="sticky top-0 z-30 -mx-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-void/95 px-4 py-3 backdrop-blur md:-mx-8 md:px-8">
+      <div className="sticky top-0 z-30 -mx-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-void px-4 py-3 md:-mx-8 md:px-8">
         <div className="flex items-center gap-3">
           <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-silver/45">
             {post ? "Editing article" : "New article"}

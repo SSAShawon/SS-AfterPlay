@@ -108,49 +108,49 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
       <div
         aria-hidden={!isOpen}
         className={cn(
-          "fixed inset-0 z-[110] flex flex-col bg-void/95 backdrop-blur-md transition-opacity duration-300",
+          "fixed inset-0 z-[110] flex flex-col bg-void transition-opacity duration-200",
           isOpen ? "opacity-100" : "pointer-events-none opacity-0",
         )}
       >
-        <div className="shell flex items-center justify-between border-b border-white/10 py-5">
-          <span className="eyebrow">Search the archive</span>
+        <div className="shell flex h-[62px] items-center justify-between border-b border-line">
+          <span className="kicker">Search the archive</span>
           <button
             type="button"
             onClick={close}
             aria-label="Close search"
-            className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.24em] text-silver transition-colors hover:text-soft"
+            className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-silver transition-colors hover:text-soft"
           >
             Close <X className="size-3.5" />
           </button>
         </div>
 
-        <div className="shell w-full flex-1 overflow-y-auto pb-16 pt-8 md:pt-14">
+        <div className="shell w-full flex-1 overflow-y-auto pb-16 pt-10 md:pt-16">
           <form onSubmit={submit} className="mx-auto w-full max-w-3xl">
-            <div className="flex items-center gap-4 border-b border-white/15 pb-4">
-              <Search className="size-5 shrink-0 text-blood" />
+            <div className="flex items-center gap-4 border-b border-line-strong pb-4">
+              <Search className="size-5 shrink-0 text-muted" />
               <input
                 ref={inputRef}
                 value={term}
                 onChange={(event) => setTerm(event.target.value)}
                 placeholder="Games, characters, chapters, memories, essays…"
-                className="w-full bg-transparent font-serif text-2xl text-soft placeholder:text-silver/35 focus:outline-none md:text-3xl"
+                className="w-full bg-transparent font-serif text-[1.7rem] text-soft placeholder:text-muted/70 focus:outline-none md:text-[2.1rem]"
                 aria-label="Search the archive"
               />
-              {loading && <Loader2 className="size-4 animate-spin text-silver/60" />}
+              {loading && <Loader2 className="size-4 animate-spin text-muted" />}
             </div>
           </form>
 
           <div className="mx-auto mt-10 w-full max-w-3xl">
             {term.trim().length < 2 && (
               <div className="space-y-3">
-                <p className="eyebrow">Try</p>
+                <p className="kicker">Try</p>
                 <div className="flex flex-wrap gap-2">
                   {["Red Dead Redemption", "Ellie", "Erdtree", "Silent Hill", "endings"].map((suggestion) => (
                     <button
                       key={suggestion}
                       type="button"
                       onClick={() => setTerm(suggestion)}
-                      className="border border-white/12 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-silver transition-colors hover:border-blood/60 hover:text-soft"
+                      className="border border-line px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.14em] text-silver transition-colors hover:border-line-strong hover:text-soft"
                     >
                       {suggestion}
                     </button>
@@ -160,9 +160,9 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
             )}
 
             {term.trim().length >= 2 && !loading && total === 0 && (
-              <div className="border border-white/10 bg-white/[0.02] p-8 text-center">
+              <div className="border-t border-line py-8">
                 <p className="font-serif text-2xl text-soft">Nothing in the archive matches “{term}”.</p>
-                <p className="mt-2 text-sm text-silver">
+                <p className="mt-2 text-[13px] text-silver">
                   Try a game title, a character, or a chapter name.
                 </p>
               </div>
@@ -245,7 +245,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
                   close();
                   router.push(`/search?q=${encodeURIComponent(term.trim())}`);
                 }}
-                className="mt-10 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.24em] text-blood transition-opacity hover:opacity-80"
+                className="mt-10 inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-blood transition-opacity hover:opacity-80"
               >
                 View all results <ArrowUpRight className="size-3.5" />
               </button>
@@ -259,8 +259,8 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 
 function ResultGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <section className="mt-8 first:mt-0">
-      <h2 className="eyebrow border-b border-white/10 pb-2">{label}</h2>
+    <section className="mt-9 first:mt-0">
+      <h2 className="kicker border-b border-line pb-2">{label}</h2>
       <ul className="mt-1">{children}</ul>
     </section>
   );
@@ -282,13 +282,13 @@ function ResultLink({
       <Link
         href={href}
         onClick={onNavigate}
-        className="group flex items-baseline justify-between gap-6 border-b border-white/[0.06] py-3.5 transition-colors hover:border-blood/40"
+        className="group flex items-baseline justify-between gap-6 border-b border-line py-3.5 transition-colors hover:border-line-strong"
       >
         <span className="font-serif text-xl text-soft transition-colors group-hover:text-white">
           {title}
         </span>
         {meta && (
-          <span className="line-clamp-1 text-right text-[11px] text-silver/60">{meta}</span>
+          <span className="line-clamp-1 text-right text-[11px] text-muted">{meta}</span>
         )}
       </Link>
     </li>

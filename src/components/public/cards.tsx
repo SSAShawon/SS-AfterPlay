@@ -4,7 +4,13 @@ import { ArrowUpRight } from "lucide-react";
 import { ArchiveImage } from "@/components/public/archive-image";
 import { MetaRow, Rating, StatusBadge } from "@/components/public/primitives";
 import { formatDate, pad } from "@/lib/utils";
-import { GAME_STATUS_LABELS, type GameCardData, type JournalPostWithCategory, type MemoryWithGame } from "@/lib/types";
+import type {
+  GameCardData,
+  JournalPostWithCategory,
+  MemoryWithGame,
+} from "@/lib/types";
+
+const NOUNS = ["cover", "art"];
 
 export function GameCoverCard({
   game,
@@ -17,37 +23,32 @@ export function GameCoverCard({
 }) {
   return (
     <Link href={`/games/${game.slug}`} className="group block">
-      <div className="relative overflow-hidden border border-white/10 transition-colors duration-500 group-hover:border-blood/40">
+      <div className="frame border border-line transition-colors duration-200 group-hover:border-line-strong">
         <ArchiveImage
           src={game.cover_url}
-          alt={`${game.title} cover art`}
+          alt={`${game.title} ${NOUNS.join(" ")}`}
           fallbackLabel={game.title}
           priority={priority}
+          sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 20vw"
           className="aspect-[3/4] w-full"
-          imgClassName="transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.045]"
         />
-        <div className="absolute inset-x-0 bottom-0 translate-y-2 p-4 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-          <div className="flex items-center justify-between">
-            <StatusBadge status={game.status} />
-            <ArrowUpRight className="size-4 text-soft" />
-          </div>
-        </div>
-        {index !== undefined && (
-          <span className="absolute left-3 top-3 font-mono text-[9px] tracking-[0.2em] text-soft/70">
-            {pad(index)}
-          </span>
-        )}
       </div>
-      <div className="mt-3 flex items-start justify-between gap-3">
+
+      <div className="mt-3 flex items-start justify-between gap-3 border-t border-line pt-2.5">
         <div className="min-w-0">
-          <h3 className="truncate font-serif text-lg leading-tight text-soft transition-colors group-hover:text-white">
+          <h3 className="truncate font-serif text-[1.15rem] leading-tight text-soft transition-colors duration-200 group-hover:text-white">
             {game.title}
           </h3>
-          <p className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.18em] text-silver/50">
-            {[game.release_year, game.genres?.[0]].filter(Boolean).join(" · ")}
+          <p className="mt-1 truncate text-[10px] font-medium uppercase tracking-[0.14em] text-muted">
+            {[game.release_year, game.genres?.[0]].filter(Boolean).join(" / ")}
           </p>
         </div>
-        <Rating value={game.rating} className="shrink-0 pt-1" />
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <Rating value={game.rating} />
+          {index !== undefined && (
+            <span className="text-[9px] tabular-nums tracking-[0.1em] text-muted/70">{pad(index)}</span>
+          )}
+        </div>
       </div>
     </Link>
   );
@@ -57,34 +58,38 @@ export function GameListRow({ game, index }: { game: GameCardData; index: number
   return (
     <Link
       href={`/games/${game.slug}`}
-      className="group grid grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-white/[0.07] py-4 transition-colors hover:border-blood/40 md:grid-cols-[auto_84px_1fr_auto_auto] md:gap-6"
+      className="group grid grid-cols-[2rem_1fr_auto] items-center gap-4 border-b border-line py-3.5 transition-colors duration-200 hover:border-line-strong md:grid-cols-[2.5rem_3.25rem_1fr_auto_auto_1.5rem] md:gap-6"
     >
-      <span className="font-mono text-[10px] text-silver/35 transition-colors group-hover:text-blood/70">
+      <span className="text-[10px] tabular-nums tracking-[0.1em] text-muted/70">
         {pad(index + 1)}
       </span>
+
       <ArchiveImage
         src={game.cover_url}
-        alt={game.title}
+        alt={`${game.title} cover`}
         fallbackLabel={game.title}
-        className="hidden aspect-[3/4] w-[84px] border border-white/10 md:block"
+        sizes="52px"
+        className="hidden aspect-[3/4] w-[3.25rem] border border-line md:block"
       />
+
       <div className="min-w-0">
-        <h3 className="truncate font-serif text-xl text-soft transition-colors group-hover:text-white md:text-2xl">
+        <h3 className="truncate font-serif text-xl leading-tight text-soft transition-colors duration-200 group-hover:text-white md:text-[1.4rem]">
           {game.title}
         </h3>
-        <p className="mt-1.5 hidden font-mono text-[9px] uppercase tracking-[0.18em] text-silver/45 md:block">
+        <p className="mt-1 truncate text-[10px] font-medium uppercase tracking-[0.14em] text-muted">
           {[game.release_year, game.genres?.slice(0, 2).join(", "), game.platforms?.[0]]
             .filter(Boolean)
-            .join(" · ")}
+            .join(" / ")}
         </p>
       </div>
+
       <div className="hidden md:block">
         <StatusBadge status={game.status} />
       </div>
-      <div className="flex items-center gap-4">
-        <Rating value={game.rating} />
-        <ArrowUpRight className="size-4 text-silver/30 transition-all duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-soft" />
-      </div>
+
+      <Rating value={game.rating} />
+
+      <ArrowUpRight className="size-3.5 text-muted transition-colors duration-200 group-hover:text-soft" />
     </Link>
   );
 }
@@ -96,31 +101,33 @@ export function JournalCard({
   post: JournalPostWithCategory;
   featured?: boolean;
 }) {
+  const category = post.journal_categories?.name ?? "Essay";
+  const date = formatDate(post.published_at, "short");
+
   if (featured) {
     return (
-      <Link
-        href={`/journal/${post.slug}`}
-        className="group grid gap-6 border border-white/10 bg-charcoal/40 p-4 transition-colors hover:border-blood/40 md:grid-cols-[1.05fr_1fr] md:p-6"
-      >
-        <ArchiveImage
-          src={post.cover_url}
-          alt={post.title}
-          fallbackLabel={post.title}
-          className="aspect-[16/10] w-full"
-          imgClassName="transition-transform duration-[1400ms] group-hover:scale-[1.03]"
-        />
-        <div className="flex flex-col justify-between gap-6 p-1 md:p-3">
-          <div>
-            <MetaRow items={[post.journal_categories?.name, formatDate(post.published_at), `${post.reading_minutes ?? 5} min read`]} />
-            <h3 className="display mt-4 text-[clamp(1.6rem,3vw,2.6rem)] text-soft transition-colors group-hover:text-white">
-              {post.title}
-            </h3>
-            {post.excerpt && (
-              <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-silver/75">{post.excerpt}</p>
-            )}
-          </div>
-          <span className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-silver transition-colors group-hover:text-soft">
-            Read essay <ArrowUpRight className="size-3.5" />
+      <Link href={`/journal/${post.slug}`} className="group block">
+        <div className="frame border border-line transition-colors duration-200 group-hover:border-line-strong">
+          <ArchiveImage
+            src={post.cover_url}
+            alt={post.title}
+            fallbackLabel={post.title}
+            sizes="(max-width: 1024px) 100vw, 55vw"
+            className="aspect-[16/10] w-full"
+          />
+        </div>
+
+        <div className="mt-5">
+          <MetaRow items={[category, date, `${post.reading_minutes ?? 5} min read`]} />
+          <h3 className="display mt-3 text-[clamp(1.7rem,3.2vw,2.6rem)] text-soft transition-colors duration-200 group-hover:text-white">
+            {post.title}
+          </h3>
+          {post.excerpt && (
+            <p className="mt-3 max-w-xl text-[13.5px] leading-relaxed text-silver">{post.excerpt}</p>
+          )}
+          <span className="link-quiet mt-5">
+            Read the essay
+            <ArrowUpRight className="size-3.5" />
           </span>
         </div>
       </Link>
@@ -130,81 +137,72 @@ export function JournalCard({
   return (
     <Link
       href={`/journal/${post.slug}`}
-      className="group grid gap-4 border-b border-white/[0.07] py-6 transition-colors hover:border-blood/40 sm:grid-cols-[180px_1fr] sm:gap-6"
+      className="group grid grid-cols-[1fr_5.5rem] items-start gap-5 border-b border-line py-5 transition-colors duration-200 hover:border-line-strong sm:grid-cols-[1fr_7.5rem]"
     >
+      <div className="min-w-0">
+        <MetaRow items={[category, date]} />
+        <h3 className="mt-2 font-serif text-[1.3rem] leading-snug text-soft transition-colors duration-200 group-hover:text-white">
+          {post.title}
+        </h3>
+        {post.excerpt && (
+          <p className="mt-2 line-clamp-2 text-[12.5px] leading-relaxed text-silver/85">{post.excerpt}</p>
+        )}
+        <p className="mt-2 text-[10px] font-medium uppercase tracking-[0.14em] text-muted">
+          {post.reading_minutes ?? 5} min read
+        </p>
+      </div>
+
       <ArchiveImage
         src={post.cover_url}
         alt={post.title}
         fallbackLabel={post.title}
-        className="aspect-[16/10] w-full border border-white/10"
+        sizes="120px"
+        className="aspect-[4/3] w-full border border-line"
       />
-      <div className="flex flex-col justify-between gap-3">
-        <div>
-          <MetaRow
-            items={[
-              post.journal_categories?.name,
-              formatDate(post.published_at),
-              `${post.reading_minutes ?? 5} min read`,
-            ]}
-          />
-          <h3 className="mt-2 font-serif text-2xl leading-tight text-soft transition-colors group-hover:text-white">
-            {post.title}
-          </h3>
-          {post.excerpt && (
-            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-silver/70">{post.excerpt}</p>
-          )}
-        </div>
-        <span className="inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.2em] text-silver/60 transition-colors group-hover:text-blood">
-          Read <ArrowUpRight className="size-3" />
-        </span>
-      </div>
     </Link>
   );
 }
 
-export function MemoryCard({ memory, index }: { memory: MemoryWithGame; index?: number }) {
-  const when = memory.timeframe ?? formatDate(memory.occurred_on, "short");
+export function MemoryCard({ memory, index }: { memory: MemoryWithGame; index: number }) {
+  const meta = [memory.timeframe ?? formatDate(memory.occurred_on, "short"), memory.games?.title];
 
   return (
-    <article className="group grid gap-6 border border-white/10 bg-white/[0.015] p-5 transition-colors hover:border-blood/35 md:grid-cols-[220px_1fr] md:p-6">
-      <ArchiveImage
-        src={memory.image_url ?? memory.games?.cover_url ?? null}
-        alt={memory.title}
-        fallbackLabel={memory.title}
-        className="aspect-[4/3] w-full border border-white/10"
-      />
-      <div className="flex flex-col justify-between gap-4">
+    <article className="group grid gap-5 border-b border-line py-6 last:border-b-0 md:grid-cols-[1.15fr_1fr] md:items-start md:gap-10 md:py-8">
+      <Link href={memory.games ? `/games/${memory.games.slug}` : "/memories"} className="block">
+        <div className="frame border border-line transition-colors duration-200 group-hover:border-line-strong">
+          <ArchiveImage
+            src={memory.image_url ?? memory.games?.cover_url ?? null}
+            alt={memory.title}
+            fallbackLabel={memory.title}
+            sizes="(max-width: 768px) 100vw, 45vw"
+            className="aspect-[16/10] w-full"
+          />
+        </div>
+      </Link>
+
+      <div className="flex h-full flex-col justify-between">
         <div>
           <div className="flex items-center gap-3">
-            {index !== undefined && (
-              <span className="font-mono text-[10px] text-blood/80">{pad(index)}</span>
-            )}
-            <MetaRow items={[when, memory.games?.title]} />
+            <span className="font-serif text-lg leading-none text-blood">{pad(index)}</span>
+            <MetaRow items={meta} />
           </div>
-          <h3 className="display mt-3 text-2xl text-soft transition-colors group-hover:text-white md:text-3xl">
+          <h3 className="mt-3 font-serif text-[1.6rem] leading-tight text-soft md:text-[1.9rem]">
             {memory.title}
           </h3>
           {memory.description && (
-            <p className="mt-3 text-sm leading-relaxed text-silver/75">{memory.description}</p>
+            <p className="mt-3 max-w-xl text-[13.5px] leading-relaxed text-silver">
+              {memory.description}
+            </p>
           )}
         </div>
+
         {memory.games && (
-          <Link
-            href={`/games/${memory.games.slug}`}
-            className="inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.2em] text-silver/60 transition-colors hover:text-blood"
-          >
-            View archive entry <ArrowUpRight className="size-3" />
+          <Link href={`/games/${memory.games.slug}`} className="link-quiet mt-6">
+            Open the game file
+            <ArrowUpRight className="size-3.5" />
           </Link>
         )}
       </div>
     </article>
-  );
-}
-
-export function StatusLegend() {
-  return (
-    <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-silver/40">
-      {Object.values(GAME_STATUS_LABELS).join(" · ")}
-    </p>
   );
 }

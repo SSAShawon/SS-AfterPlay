@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, Clock, Quote, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 
 import { ArchiveImage } from "@/components/public/archive-image";
 import { GameCoverCard } from "@/components/public/cards";
 import { GameSectionNav, type NavSection } from "@/components/public/game-section-nav";
 import { Markdown } from "@/components/public/markdown";
 import { MetaRow, Rating, StatusBadge } from "@/components/public/primitives";
-import { RatingDial, ScoreBar } from "@/components/public/score";
 import { ReadingProgress } from "@/components/public/reading-progress";
-import { Reveal } from "@/components/public/reveal";
 import { SpoilerGate } from "@/components/public/spoiler-gate";
 import { getGameBySlug } from "@/lib/queries/games";
 import { cn, formatDate, formatRating, pad } from "@/lib/utils";
@@ -26,67 +24,30 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const game = await getGameBySlug(slug);
 
-  if (!game) {
-    return { title: "Entry not found" };
-  }
-
-  const description =
-    game.summary ??
-    `${game.title} — full archive entry: storyline, chapters, characters, memorable moments and personal verdict.`;
+  if (!game) return { title: "Game not found" };
 
   return {
-    title: `${game.title} — Archive file`,
-    description,
+    title: game.title,
+    description: game.summary ?? `${game.title} — the full archive entry.`,
     openGraph: {
       title: `${game.title} — SS AFTERPLAY`,
-      description,
+      description: game.summary ?? undefined,
       type: "article",
-      images: game.hero_url ? [{ url: game.hero_url }] : game.cover_url ? [{ url: game.cover_url }] : undefined,
+      images: game.hero_url || game.cover_url ? [{ url: (game.hero_url ?? game.cover_url) as string }] : undefined,
     },
   };
 }
 
-function Section({
-  id,
-  index,
-  label,
-  title,
-  aside,
-  children,
-  tone = "default",
-}: {
-  id: string;
-  index: number;
-  label: string;
-  title: string;
-  aside?: React.ReactNode;
-  children: React.ReactNode;
-  tone?: "default" | "muted";
-}) {
-  return (
-    <section
-      id={id}
-      className={`scroll-mt-32 border-b border-white/10 py-16 md:py-24 ${
-        tone === "muted" ? "bg-white/[0.012]" : ""
-      }`}
-    >
-      <div className="shell">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div className="max-w-2xl">
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-[10px] text-blood/80">{pad(index)}</span>
-              <span className="h-px w-8 bg-white/20" />
-              <span className="eyebrow">{label}</span>
-            </div>
-            <h2 className="display mt-4 text-[clamp(1.9rem,4vw,3.1rem)] text-soft">{title}</h2>
-          </div>
-          {aside && <div className="shrink-0">{aside}</div>}
-        </div>
-        <div className="mt-10 md:mt-12">{children}</div>
-      </div>
-    </section>
-  );
-}
+const SECTIONS: (NavSection & { key: string })[] = [
+  { id: "overview", label: "Overview", key: "overview" },
+  { id: "storyline", label: "Storyline", key: "storyline" },
+  { id: "chapters", label: "Chapters", key: "chapters" },
+  { id: "characters", label: "Characters", key: "characters" },
+  { id: "moments", label: "Moments", key: "moments" },
+  { id: "review", label: "Review", key: "review" },
+  { id: "verdict", label: "Verdict", key: "verdict" },
+  { id: "related", label: "Related", key: "related" },
+];
 
 export default async function GamePage({ params }: PageProps) {
   const { slug } = await params;
@@ -94,572 +55,615 @@ export default async function GamePage({ params }: PageProps) {
 
   if (!game) notFound();
 
-  const sections: NavSection[] = [
-    { id: "overview", label: "Overview" },
-    ...(game.storyline ? [{ id: "storyline", label: "Storyline" }] : []),
-    ...(game.chapters.length ? [{ id: "chapters", label: "Chapters" }] : []),
-    ...(game.characters.length ? [{ id: "characters", label: "Characters" }] : []),
-    ...(game.moments.length ? [{ id: "moments", label: "Moments" }] : []),
-    ...(game.reviews.length ? [{ id: "review", label: "Craft" }] : []),
-    { id: "verdict", label: "Verdict" },
-    ...(game.related.length ? [{ id: "related", label: "Related" }] : []),
-  ];
+  const sections = SECTIONS.filter((section) => {
+    if (section.id === "storyline") return Boolean(game.storyline);
+    if (section.id === "chapters") return game.chapters.length > 0;
+    if (section.id === "characters") return game.characters.length > 0;
+    if (section.id === "moments") return game.moments.length > 0;
+    if (section.id === "review") return game.reviews.length > 0;
+    return true;
+  });
+
+  const facts = [
+    { label: "Developer", value: game.developer },
+    { label: "Publisher", value: game.publisher },
+    { label: "Released", value: game.release_year ? String(game.release_year) : null },
+    { label: "Genres", value: game.genres?.join(", ") },
+    { label: "Platforms", value: game.platforms?.join(", ") },
+    { label: "Status", value: GAME_STATUS_LABELS[game.status] },
+    { label: "Started", value: formatDate(game.started_on, "short") },
+    { label: "Completed", value: formatDate(game.completed_on, "short") },
+    { label: "Playtime", value: game.playtime_hours ? `${game.playtime_hours} hours` : null },
+  ].filter((fact) => Boolean(fact.value));
 
   return (
     <>
       <ReadingProgress />
 
-      {/* 01 — cinematic cover */}
-      <section className="relative isolate flex min-h-[88svh] flex-col justify-end overflow-hidden">
+      {/* ── Cover ─────────────────────────────────────────────────── */}
+      <section className="relative isolate flex min-h-[clamp(26rem,64vh,40rem)] flex-col justify-end overflow-hidden border-b border-line">
         <div className="absolute inset-0">
           <ArchiveImage
             src={game.hero_url ?? game.cover_url}
-            alt={`${game.title} artwork`}
+            alt={game.title}
             fallbackLabel={game.title}
             priority
+            sizes="100vw"
             className="size-full"
           />
-          <div className="absolute inset-0 bg-[radial-gradient(120%_100%_at_50%_10%,rgba(8,9,12,0.25),rgba(8,9,12,0.8)_65%,#08090C_100%)]" />
-          <div className="absolute inset-0 bg-gradient-to-t from-void via-void/50 to-void/20" />
-          <div className="absolute inset-0 grain" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_top,#08090C_3%,rgba(8,9,12,0.88)_34%,rgba(8,9,12,0.42)_70%,rgba(8,9,12,0.6)_100%)]" />
         </div>
 
-        <div className="shell relative w-full pb-10 pt-32 md:pb-14">
+        <div className="shell relative w-full pb-8 pt-28">
           <Link
             href="/collection"
-            className="group inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.22em] text-silver/60 transition-colors hover:text-soft"
+            className="inline-flex items-center gap-2 text-[9.5px] font-medium uppercase tracking-[0.2em] text-silver/80 transition-colors hover:text-soft"
           >
-            <ArrowLeft className="size-3 transition-transform duration-500 group-hover:-translate-x-1" />
-            Back to collection
+            <ArrowLeft className="size-3" />
+            The collection
           </Link>
 
-          <div className="mt-8 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
-            <div className="max-w-3xl">
-              <MetaRow
-                items={[
-                  "Archive file",
-                  game.release_year,
-                  game.developer,
-                  game.genres?.[0],
-                ]}
-              />
-              <h1 className="display mt-4 text-[clamp(2.6rem,7vw,6rem)] text-soft text-shadow-cinema">
-                {game.title}
-              </h1>
-              {game.tagline && (
-                <p className="mt-3 font-serif text-xl italic text-silver/75 md:text-2xl">
-                  {game.tagline}
-                </p>
-              )}
-              <div className="mt-6 flex flex-wrap items-center gap-3">
-                <StatusBadge status={game.status} />
-                {game.platforms?.map((platform) => (
-                  <span
-                    key={platform}
-                    className="border border-white/12 px-2 py-1 font-mono text-[8.5px] uppercase tracking-[0.18em] text-silver/60"
-                  >
-                    {platform}
-                  </span>
-                ))}
-                {game.playtime_hours ? (
-                  <span className="inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.18em] text-silver/50">
-                    <Clock className="size-3" /> {game.playtime_hours}h logged
-                  </span>
-                ) : null}
-              </div>
-            </div>
+          <div className="mt-6 flex items-center gap-3">
+            <span className="archivedot" aria-hidden />
+            <p className="kicker text-silver/80">
+              Case file {game.release_year ? `/ ${game.release_year}` : ""}
+            </p>
+          </div>
 
-            <div className="flex items-end gap-6">
-              <div className="hidden text-right md:block">
-                <p className="eyebrow">Personal rating</p>
-                <p className="mt-2 font-serif text-5xl leading-none text-soft">
-                  {formatRating(game.rating)}
-                  <span className="font-sans text-sm text-silver/40">/10</span>
-                </p>
-              </div>
-              <div className="md:hidden">
-                <RatingDial value={game.rating} size={104} />
-              </div>
-            </div>
+          <h1 className="display mt-4 max-w-[20ch] text-[clamp(2.4rem,6.4vw,5rem)] text-soft">
+            {game.title}
+          </h1>
+
+          {game.tagline && (
+            <p className="mt-3 max-w-2xl font-serif text-[clamp(1.1rem,2.2vw,1.6rem)] italic text-white/80">
+              {game.tagline}
+            </p>
+          )}
+
+          <div className="mt-6">
+            <MetaRow
+              items={[
+                game.developer,
+                game.release_year,
+                game.genres?.slice(0, 2).join(", "),
+                game.platforms?.slice(0, 2).join(" / "),
+              ]}
+              className="text-silver/75"
+            />
           </div>
         </div>
       </section>
+
+      {/* facts bar */}
+      <div className="border-b border-line bg-void">
+        <div className="shell flex flex-wrap items-center gap-x-10 gap-y-4 py-4">
+          <div className="flex items-baseline gap-2">
+            <span className="text-[9px] font-medium uppercase tracking-[0.18em] text-muted">Rating</span>
+            <Rating value={game.rating} />
+          </div>
+          <StatusBadge status={game.status} />
+          {game.playtime_hours ? (
+            <span className="text-[9.5px] font-medium uppercase tracking-[0.16em] text-silver">
+              {game.playtime_hours}h logged
+            </span>
+          ) : null}
+          <span className="hidden text-[9.5px] font-medium uppercase tracking-[0.16em] text-muted md:inline">
+            {game.chapters.length} chapters · {game.characters.length} characters · {game.moments.length} moments
+          </span>
+          <a
+            href="#verdict"
+            className="ml-auto hidden text-[9.5px] font-medium uppercase tracking-[0.16em] text-silver transition-colors hover:text-soft sm:inline"
+          >
+            Jump to verdict
+          </a>
+        </div>
+      </div>
 
       <GameSectionNav sections={sections} />
 
-      {/* spec strip */}
-      <section className="border-b border-white/10 bg-[#0a0b0e]">
-        <div className="shell grid grid-cols-2 gap-x-6 gap-y-6 py-8 sm:grid-cols-3 lg:grid-cols-8">
-          {[
-            { label: "Developer", value: game.developer },
-            { label: "Publisher", value: game.publisher },
-            { label: "Released", value: game.release_year ? String(game.release_year) : null },
-            { label: "Genre", value: game.genres?.join(", ") || null },
-            { label: "Platform", value: game.platforms?.join(", ") || null },
-            { label: "Status", value: GAME_STATUS_LABELS[game.status] },
-            { label: "Started", value: formatDate(game.started_on, "short") },
-            { label: "Completed", value: formatDate(game.completed_on, "short") },
-          ].map((item) => (
-            <div key={item.label}>
-              <p className="eyebrow">{item.label}</p>
-              <p className="mt-1.5 text-[13px] leading-snug text-soft/90">{item.value ?? "—"}</p>
+      {/* ── 01 · Overview ─────────────────────────────────────────── */}
+      <section id="overview" className="scroll-mt-32 border-b border-line py-14 md:py-20">
+        <div className="shell grid gap-10 lg:grid-cols-12 lg:gap-14">
+          <div className="lg:col-span-7">
+            <p className="kicker">01 — Overview</p>
+            <h2 className="display mt-4 text-[clamp(1.8rem,3.4vw,2.7rem)] text-soft">
+              What this game is
+            </h2>
+
+            {game.summary && (
+              <p className="mt-6 max-w-2xl font-serif text-[clamp(1.2rem,2vw,1.55rem)] leading-snug text-soft/95">
+                {game.summary}
+              </p>
+            )}
+
+            <div className="mt-9 grid gap-x-10 gap-y-7 sm:grid-cols-2">
+              {[
+                { label: "Why it is in the archive", value: game.why_archived },
+                { label: "Setting", value: game.setting },
+                { label: "Gameplay", value: game.gameplay_type },
+                { label: "Main theme", value: game.main_theme },
+              ]
+                .filter((item) => item.value)
+                .map((item) => (
+                  <div key={item.label} className="border-t border-line pt-3">
+                    <p className="kicker">{item.label}</p>
+                    <p className="mt-2 text-[13.5px] leading-relaxed text-silver">{item.value}</p>
+                  </div>
+                ))}
             </div>
-          ))}
+          </div>
+
+          <aside className="lg:col-span-5">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-1">
+              <div className="lg:order-2">
+                <dl className="border-t border-line">
+                  {facts.map((fact) => (
+                    <div
+                      key={fact.label}
+                      className="flex items-baseline justify-between gap-4 border-b border-line py-2.5"
+                    >
+                      <dt className="text-[9.5px] font-medium uppercase tracking-[0.16em] text-muted">
+                        {fact.label}
+                      </dt>
+                      <dd className="text-right text-[12.5px] text-soft">{fact.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+
+              <div className="lg:order-1">
+                <div className="frame border border-line">
+                  <ArchiveImage
+                    src={game.cover_url}
+                    alt={`${game.title} cover art`}
+                    fallbackLabel={game.title}
+                    sizes="(max-width: 640px) 45vw, 30vw"
+                    className="aspect-[3/4] w-full"
+                  />
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
       </section>
 
-      {/* 02 — overview */}
-      <Section
-        id="overview"
-        index={2}
-        label="Game overview"
-        title="What this game is"
-        aside={
-          <div className="hidden shrink-0 md:block">
-            <RatingDial value={game.rating} size={116} />
-          </div>
-        }
-      >
-        <div className="grid gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-7">
-            {game.cover_url && (
-              <div className="mb-8 flex gap-6 md:hidden">
-                <ArchiveImage
-                  src={game.cover_url}
-                  alt={game.title}
-                  fallbackLabel={game.title}
-                  className="aspect-[3/4] w-32 shrink-0 border border-white/10"
-                />
-                <p className="self-end font-serif text-lg italic leading-relaxed text-silver/70">
-                  {game.tagline}
-                </p>
-              </div>
-            )}
-            {game.summary ? (
-              <Markdown content={game.summary} />
-            ) : (
-              <p className="text-sm text-silver/50">No overview written yet.</p>
-            )}
-
-            {game.why_archived && (
-              <div className="mt-10 border-l border-blood/50 pl-5">
-                <p className="eyebrow text-blood/80">Why it is in the archive</p>
-                <p className="mt-3 font-serif text-xl italic leading-relaxed text-soft/90">
-                  {game.why_archived}
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div className="lg:col-span-5">
-            <div className="border border-white/10 bg-white/[0.015]">
-              {[
-                { label: "Setting", value: game.setting },
-                { label: "Gameplay type", value: game.gameplay_type },
-                { label: "Main theme", value: game.main_theme },
-              ].map((item, index) => (
-                <div
-                  key={item.label}
-                  className={`p-5 ${index > 0 ? "border-t border-white/[0.07]" : ""}`}
-                >
-                  <p className="eyebrow">{item.label}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-silver/80">
-                    {item.value ?? "Not documented yet."}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Section>
-
-      {/* 03 — storyline */}
+      {/* ── 02 · Storyline ────────────────────────────────────────── */}
       {game.storyline && (
-        <Section
-          id="storyline"
-          index={3}
-          label="Complete storyline"
-          title="The whole story, start to finish"
-          tone="muted"
-          aside={
-            <p className="max-w-[15rem] font-mono text-[9px] uppercase leading-relaxed tracking-[0.18em] text-silver/40">
-              Contains major spoilers.
-              <br />
-              Reveal deliberately.
-            </p>
-          }
-        >
-          <SpoilerGate>
-            <div className="max-w-3xl">
-              <Markdown content={game.storyline} />
+        <section id="storyline" className="scroll-mt-32 border-b border-line py-14 md:py-20">
+          <div className="shell grid gap-8 lg:grid-cols-12 lg:gap-14">
+            <div className="lg:col-span-3">
+              <p className="kicker">02 — Storyline</p>
+              <h2 className="display mt-4 text-[clamp(1.7rem,3vw,2.3rem)] text-soft">
+                The whole story
+              </h2>
+              <p className="mt-4 text-[12.5px] leading-relaxed text-muted">
+                Start to finish, in order. Gated so the story stays yours until you ask for it.
+              </p>
             </div>
-          </SpoilerGate>
-        </Section>
+
+            <div className="lg:col-span-9">
+              <SpoilerGate>
+                <div className="prose-archive dropcap">
+                  <Markdown content={game.storyline} />
+                </div>
+              </SpoilerGate>
+            </div>
+          </div>
+        </section>
       )}
 
-      {/* 04 — chapters */}
+      {/* ── 03 · Chapters ─────────────────────────────────────────── */}
       {game.chapters.length > 0 && (
-        <Section
-          id="chapters"
-          index={4}
-          label="Chapter breakdown"
-          title="Chapter by chapter"
-          aside={
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-silver/40">
-              {game.chapters.length} chapters
-            </span>
-          }
-        >
-          <div className="grid gap-10 lg:grid-cols-12">
-            <nav className="lg:col-span-3" aria-label="Chapter navigation">
-              <p className="eyebrow border-b border-white/10 pb-3">Chapter index</p>
-              <ol className="mt-3 space-y-1">
+        <section id="chapters" className="scroll-mt-32 border-b border-line py-14 md:py-20">
+          <div className="shell grid gap-8 lg:grid-cols-12 lg:gap-14">
+            <div className="lg:col-span-3">
+              <div className="lg:sticky lg:top-32">
+                <p className="kicker">03 — Chapters</p>
+                <h2 className="display mt-4 text-[clamp(1.7rem,3vw,2.3rem)] text-soft">
+                  Chapter by chapter
+                </h2>
+                <p className="mt-4 text-[12.5px] leading-relaxed text-muted">
+                  {game.chapters.length} chapters, with the events that moved the story and the
+                  developments that changed it.
+                </p>
+
+                <ol className="mt-6 hidden space-y-1 lg:block">
+                  {game.chapters.map((chapter, index) => (
+                    <li key={chapter.id}>
+                      <a
+                        href={`#chapter-${chapter.id}`}
+                        className="flex items-baseline gap-3 text-[11px] text-muted transition-colors hover:text-soft"
+                      >
+                        <span className="tabular-nums text-blood/60">{pad(index + 1)}</span>
+                        <span className="truncate">{chapter.title}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+
+            <div className="lg:col-span-9">
+              <div className="border-t border-line">
                 {game.chapters.map((chapter, index) => (
-                  <li key={chapter.id}>
-                    <a
-                      href={`#chapter-${chapter.id}`}
-                      className="group flex items-baseline gap-3 border-b border-white/[0.05] py-2 text-sm text-silver/60 transition-colors hover:text-soft"
-                    >
-                      <span className="font-mono text-[9px] text-blood/60">
+                  <article
+                    key={chapter.id}
+                    id={`chapter-${chapter.id}`}
+                    className="scroll-mt-32 border-b border-line py-7 md:py-8"
+                  >
+                    <div className="flex items-baseline gap-4">
+                      <span className="text-[11px] tabular-nums tracking-[0.1em] text-blood">
                         {pad(index + 1)}
                       </span>
-                      <span className="line-clamp-1">{chapter.title}</span>
-                    </a>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-
-            <div className="space-y-14 lg:col-span-9">
-              {game.chapters.map((chapter, index) => (
-                <article key={chapter.id} id={`chapter-${chapter.id}`} className="scroll-mt-36">
-                  <div className="flex items-baseline gap-4">
-                    <span className="font-serif text-4xl leading-none text-white/15">
-                      {pad(index + 1)}
-                    </span>
-                    <div>
-                      <p className="eyebrow">Chapter {index + 1}</p>
-                      <h3 className="mt-1 font-serif text-2xl text-soft md:text-3xl">
+                      <h3 className="font-serif text-[1.6rem] leading-tight text-soft md:text-[1.85rem]">
                         {chapter.title}
                       </h3>
                     </div>
-                  </div>
 
-                  <div className="mt-5 space-y-5 border-l border-white/10 pl-5 md:ml-10">
                     {chapter.summary && (
-                      <p className="text-sm leading-[1.85] text-silver/85">{chapter.summary}</p>
+                      <p className="mt-3 max-w-2xl text-[13.5px] leading-relaxed text-silver">
+                        {chapter.summary}
+                      </p>
                     )}
 
                     {(chapter.important_events || chapter.story_developments) && (
-                      <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="mt-5 grid gap-x-10 gap-y-4 sm:grid-cols-2">
                         {chapter.important_events && (
-                          <div className="border border-white/10 bg-white/[0.015] p-4">
-                            <p className="eyebrow text-blood/70">Important events</p>
-                            <p className="mt-2 text-xs leading-relaxed text-silver/75">
+                          <div>
+                            <p className="kicker">Important events</p>
+                            <p className="mt-2 text-[12.5px] leading-relaxed text-silver/85">
                               {chapter.important_events}
                             </p>
                           </div>
                         )}
                         {chapter.story_developments && (
-                          <div className="border border-white/10 bg-white/[0.015] p-4">
-                            <p className="eyebrow">Story developments</p>
-                            <p className="mt-2 text-xs leading-relaxed text-silver/75">
+                          <div>
+                            <p className="kicker">Story developments</p>
+                            <p className="mt-2 text-[12.5px] leading-relaxed text-silver/85">
                               {chapter.story_developments}
                             </p>
                           </div>
                         )}
                       </div>
                     )}
-                  </div>
-                </article>
-              ))}
+                  </article>
+                ))}
+              </div>
             </div>
           </div>
-        </Section>
+        </section>
       )}
 
-      {/* 05 — characters */}
+      {/* ── 04 · Characters ───────────────────────────────────────── */}
       {game.characters.length > 0 && (
-        <Section
-          id="characters"
-          index={5}
-          label="Characters & analysis"
-          title="The people in the story"
-          tone="muted"
-        >
-          <div className="space-y-16">
-            {game.characters.map((character, index) => (
-              <Reveal key={character.id}>
-                <article className={cn("grid gap-8 md:grid-cols-12", !character.portrait_url && "gap-0")}>
-                  {character.portrait_url && (
-                    <div className="md:col-span-4">
-                      <ArchiveImage
-                        src={character.portrait_url}
-                        alt={character.name}
-                        fallbackLabel={character.name}
-                        className="aspect-[3/4] w-full max-w-[280px] border border-white/10"
-                      />
-                    </div>
-                  )}
+        <section id="characters" className="scroll-mt-32 border-b border-line py-14 md:py-20">
+          <div className="shell">
+            <div className="flex flex-wrap items-end justify-between gap-4 border-t border-line pt-6">
+              <div>
+                <p className="kicker">04 — Characters</p>
+                <h2 className="display mt-4 text-[clamp(1.8rem,3.4vw,2.6rem)] text-soft">
+                  The people in the story
+                </h2>
+              </div>
+              <p className="max-w-sm text-[12.5px] leading-relaxed text-muted">
+                Written as analysis, not description — who they are, how they change, and why they
+                stay with me.
+              </p>
+            </div>
 
-                  <div className={character.portrait_url ? "md:col-span-8" : "md:col-span-10"}>
-                    <div className="flex items-baseline gap-3">
-                      <span className="font-mono text-[10px] text-blood/70">
-                        {pad(index + 1)}
-                      </span>
-                      <h3 className="display text-3xl text-soft md:text-4xl">{character.name}</h3>
-                    </div>
-                    {character.role && (
-                      <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.2em] text-silver/50">
-                        {character.role}
-                      </p>
-                    )}
-
-                    <dl className="mt-6 grid gap-x-8 gap-y-5 sm:grid-cols-2">
-                      {[
-                        { label: "Personality", value: character.personality },
-                        { label: "Background", value: character.background },
-                        { label: "Development", value: character.development },
-                      ]
-                        .filter((item) => item.value)
-                        .map((item) => (
-                          <div key={item.label} className="border-t border-white/10 pt-3">
-                            <dt className="eyebrow">{item.label}</dt>
-                            <dd className="mt-2 text-xs leading-relaxed text-silver/75">{item.value}</dd>
-                          </div>
-                        ))}
-                    </dl>
-
-                    {character.analysis && (
-                      <div className="mt-7 flex gap-4 border-l border-blood/50 pl-5">
-                        <Quote className="mt-1 size-4 shrink-0 text-blood/50" />
-                        <div>
-                          <p className="eyebrow text-blood/70">Personal analysis</p>
-                          <p className="mt-2 font-serif text-lg italic leading-relaxed text-soft/85">
-                            {character.analysis}
-                          </p>
+            <div className="mt-10 space-y-12 md:space-y-16">
+              {game.characters.map((character, index) => {
+                const hasPortrait = Boolean(character.portrait_url);
+                return (
+                  <article
+                    key={character.id}
+                    className="grid gap-6 border-t border-line pt-7 md:gap-10 lg:grid-cols-12"
+                  >
+                    {hasPortrait && (
+                      <div className="lg:col-span-3">
+                        <div className="frame border border-line">
+                          <ArchiveImage
+                            src={character.portrait_url}
+                            alt={character.name}
+                            fallbackLabel={character.name}
+                            sizes="(max-width: 1024px) 40vw, 22vw"
+                            className="aspect-[3/4] w-full"
+                          />
                         </div>
                       </div>
                     )}
-                  </div>
-                </article>
-              </Reveal>
-            ))}
+
+                    <div className={hasPortrait ? "lg:col-span-9" : "lg:col-span-12"}>
+                      <div className="flex items-baseline gap-4">
+                        <span className="text-[11px] tabular-nums tracking-[0.1em] text-blood">
+                          {pad(index + 1)}
+                        </span>
+                        <div>
+                          <h3 className="font-serif text-[1.8rem] leading-none text-soft md:text-[2.1rem]">
+                            {character.name}
+                          </h3>
+                          {character.role && (
+                            <p className="mt-2 text-[9.5px] font-medium uppercase tracking-[0.18em] text-muted">
+                              {character.role}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="mt-5 grid gap-x-10 gap-y-5 sm:grid-cols-2">
+                        {[
+                          { label: "Personality", value: character.personality },
+                          { label: "Background", value: character.background },
+                          { label: "Development", value: character.development },
+                        ]
+                          .filter((item) => item.value)
+                          .map((item) => (
+                            <div key={item.label}>
+                              <p className="kicker">{item.label}</p>
+                              <p className="mt-2 text-[12.5px] leading-relaxed text-silver/90">
+                                {item.value}
+                              </p>
+                            </div>
+                          ))}
+                      </div>
+
+                      {character.analysis && (
+                        <p className="mt-6 border-l-2 border-blood pl-5 font-serif text-[1.15rem] italic leading-relaxed text-soft/90">
+                          {character.analysis}
+                        </p>
+                      )}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
           </div>
-        </Section>
+        </section>
       )}
 
-      {/* 06 — moments */}
+      {/* ── 05 · Moments ──────────────────────────────────────────── */}
       {game.moments.length > 0 && (
-        <Section
-          id="moments"
-          index={6}
-          label="Best & most memorable"
-          title="Moments that stayed"
-        >
-          <div className="space-y-10">
-            {game.moments.map((moment, index) => (
-              <Reveal key={moment.id}>
+        <section id="moments" className="scroll-mt-32 border-b border-line py-14 md:py-20">
+          <div className="shell">
+            <div className="border-t border-line pt-6">
+              <p className="kicker">05 — Memorable moments</p>
+              <h2 className="display mt-4 text-[clamp(1.8rem,3.4vw,2.6rem)] text-soft">
+                Moments that stayed
+              </h2>
+            </div>
+
+            <div className="mt-9 space-y-10 md:space-y-14">
+              {game.moments.map((moment, index) => (
                 <article
-                  className={`grid gap-8 border border-white/10 bg-white/[0.015] p-5 md:p-7 ${
-                    moment.image_url ? "md:grid-cols-12" : ""
-                  }`}
+                  key={moment.id}
+                  className={cn(
+                    "grid gap-6 border-t border-line pt-7 md:gap-10 lg:grid-cols-12",
+                  )}
                 >
                   {moment.image_url && (
-                    <div className="md:col-span-5">
-                      <ArchiveImage
-                        src={moment.image_url}
-                        alt={moment.title}
-                        fallbackLabel={moment.title}
-                        className="aspect-[16/10] w-full border border-white/10"
-                      />
+                    <div
+                      className={cn(
+                        "lg:col-span-5",
+                        index % 2 === 1 && "lg:order-2",
+                      )}
+                    >
+                      <div className="frame border border-line">
+                        <ArchiveImage
+                          src={moment.image_url}
+                          alt={moment.title}
+                          fallbackLabel={moment.title}
+                          sizes="(max-width: 1024px) 100vw, 40vw"
+                          className="aspect-[16/10] w-full"
+                        />
+                      </div>
                     </div>
                   )}
-                  <div className={moment.image_url ? "md:col-span-7" : ""}>
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-[10px] text-blood/70">{pad(index + 1)}</span>
-                      <span className="h-px w-6 bg-white/20" />
-                      <span className="eyebrow">Moment</span>
+
+                  <div
+                    className={cn(
+                      moment.image_url ? "lg:col-span-7" : "lg:col-span-12",
+                      index % 2 === 1 && moment.image_url && "lg:order-1",
+                    )}
+                  >
+                    <div className="flex items-baseline gap-4">
+                      <span className="font-serif text-lg leading-none text-blood">
+                        {pad(index + 1)}
+                      </span>
+                      <h3 className="font-serif text-[1.65rem] leading-tight text-soft md:text-[1.9rem]">
+                        {moment.title}
+                      </h3>
                     </div>
-                    <h3 className="display mt-3 text-2xl text-soft md:text-3xl">{moment.title}</h3>
+
                     {moment.description && (
-                      <p className="mt-3 text-sm leading-relaxed text-silver/80">
+                      <p className="mt-3 max-w-xl text-[13.5px] leading-relaxed text-silver">
                         {moment.description}
                       </p>
                     )}
+
                     {moment.why_memorable && (
-                      <div className="mt-5 border-t border-white/10 pt-4">
-                        <p className="eyebrow text-blood/70">Why it is memorable</p>
-                        <p className="mt-2 font-serif text-lg italic leading-relaxed text-soft/85">
+                      <div className="mt-5 border-l-2 border-blood pl-5">
+                        <p className="kicker text-blood/80">Why it is memorable</p>
+                        <p className="mt-2 font-serif text-[1.1rem] italic leading-relaxed text-soft/90">
                           {moment.why_memorable}
                         </p>
                       </div>
                     )}
                   </div>
                 </article>
-              </Reveal>
-            ))}
+              ))}
+            </div>
           </div>
-        </Section>
+        </section>
       )}
 
-      {/* 07 — craft */}
+      {/* ── 06 · Review ───────────────────────────────────────────── */}
       {game.reviews.length > 0 && (
-        <Section
-          id="review"
-          index={7}
-          label="Gameplay & technical review"
-          title="How it plays, looks and sounds"
-          tone="muted"
-        >
-          <div className="grid gap-10 lg:grid-cols-12">
+        <section id="review" className="scroll-mt-32 border-b border-line py-14 md:py-20">
+          <div className="shell grid gap-8 lg:grid-cols-12 lg:gap-14">
+            <div className="lg:col-span-4">
+              <div className="lg:sticky lg:top-32">
+                <p className="kicker">06 — Review</p>
+                <h2 className="display mt-4 text-[clamp(1.8rem,3.2vw,2.5rem)] text-soft">
+                  How it plays, looks and sounds
+                </h2>
+                <p className="mt-4 max-w-xs text-[12.5px] leading-relaxed text-muted">
+                  Scored by hand, category by category. The numbers matter less than the sentences
+                  beside them.
+                </p>
+
+                <div className="mt-7 flex items-baseline gap-2 border-t border-line pt-4">
+                  <span className="text-[9.5px] font-medium uppercase tracking-[0.18em] text-muted">
+                    Overall
+                  </span>
+                  <span className="ml-auto font-serif text-[2.2rem] leading-none text-soft">
+                    {game.rating === null ? "—" : formatRating(game.rating)}
+                  </span>
+                  <span className="text-[10px] uppercase tracking-[0.14em] text-muted">/10</span>
+                </div>
+              </div>
+            </div>
+
             <div className="lg:col-span-8">
-              <div className="border-t border-white/[0.07]">
+              <div className="border-t border-line">
                 {game.reviews.map((review) => (
-                  <div key={review.id}>
-                    <ScoreBar label={review.label} score={review.score} />
+                  <div key={review.id} className="border-b border-line py-6">
+                    <div className="flex items-baseline justify-between gap-4">
+                      <h3 className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-soft">
+                        {review.label}
+                      </h3>
+                      <span className="font-serif text-[1.35rem] leading-none text-soft">
+                        {review.score === null ? "—" : formatRating(review.score)}
+                      </span>
+                    </div>
+
+                    <div className="mt-3 h-px w-full bg-line">
+                      <div
+                        className="h-px bg-soft/60"
+                        style={{ width: `${review.score === null ? 0 : (review.score / 10) * 100}%` }}
+                      />
+                    </div>
+
                     {review.body && (
-                      <p className="-mt-1 pb-5 text-sm leading-relaxed text-silver/75">{review.body}</p>
+                      <p className="mt-3 max-w-2xl text-[13px] leading-relaxed text-silver">
+                        {review.body}
+                      </p>
                     )}
                   </div>
                 ))}
               </div>
             </div>
-
-            <aside className="lg:col-span-4">
-              <div className="border border-white/10 bg-void/60 p-6">
-                <p className="eyebrow">Craft average</p>
-                <p className="mt-2 font-serif text-4xl text-soft">
-                  {formatRating(
-                    Math.round(
-                      (game.reviews.reduce((total, review) => total + Number(review.score ?? 0), 0) /
-                        game.reviews.length) *
-                        10,
-                    ) / 10,
-                  )}
-                  <span className="font-sans text-sm text-silver/40">/10</span>
-                </p>
-                <p className="mt-3 text-xs leading-relaxed text-silver/50">
-                  Averaged across {game.reviews.length} documented criteria. The personal verdict
-                  below is the number that counts.
-                </p>
-              </div>
-            </aside>
           </div>
-        </Section>
+        </section>
       )}
 
-      {/* 08 — verdict */}
-      <Section
-        id="verdict"
-        index={8}
-        label="Final verdict"
-        title="Would I recommend it?"
-        tone="muted"
-      >
-        <div className="grid gap-10 lg:grid-cols-12">
+      {/* ── 07 · Verdict ──────────────────────────────────────────── */}
+      <section id="verdict" className="scroll-mt-32 border-b border-line bg-[#0a0b0e] py-14 md:py-20">
+        <div className="shell grid gap-10 lg:grid-cols-12 lg:gap-14">
           <div className="lg:col-span-4">
-            <div className="flex flex-col items-start gap-6 border border-white/10 bg-void/50 p-7">
-              <RatingDial value={game.rating} />
-              <div>
-                <p className="eyebrow">Overall rating</p>
-                <p className="mt-2 font-serif text-2xl text-soft">
-                  {game.rating && game.rating >= 9
-                    ? "Essential"
-                    : game.rating && game.rating >= 8
-                      ? "Highly recommended"
-                      : game.rating && game.rating >= 7
-                        ? "Worth your time"
-                        : game.rating
-                          ? "For the curious"
-                          : "Unrated"}
+            <p className="kicker">07 — Final verdict</p>
+            <div className="mt-5 flex items-baseline gap-3">
+              <span className="font-serif text-[clamp(4rem,8vw,6.5rem)] leading-[0.8] text-soft">
+                {game.rating === null ? "—" : formatRating(game.rating)}
+              </span>
+              <div className="pb-1">
+                <p className="text-[10px] uppercase tracking-[0.16em] text-muted">out of 10</p>
+                <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-silver">
+                  {GAME_STATUS_LABELS[game.status]}
                 </p>
               </div>
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={`size-3.5 ${
-                      game.rating && game.rating >= star * 2
-                        ? "fill-blood text-blood"
-                        : "text-white/15"
-                    }`}
-                  />
+            </div>
+
+            <div className="mt-8 space-y-4">
+              {[
+                { label: "Recommendation", value: game.recommendation },
+                { label: "Would I replay it?", value: game.replay_recommendation },
+              ]
+                .filter((item) => item.value)
+                .map((item) => (
+                  <div key={item.label} className="border-t border-line pt-3">
+                    <p className="kicker">{item.label}</p>
+                    <p className="mt-2 text-[13px] leading-relaxed text-silver">{item.value}</p>
+                  </div>
                 ))}
-              </div>
             </div>
           </div>
 
           <div className="lg:col-span-8">
-            <dl className="grid gap-6 sm:grid-cols-2">
+            {game.final_verdict && (
+              <p className="font-serif text-[clamp(1.3rem,2.4vw,1.75rem)] leading-[1.45] text-soft/95">
+                {game.final_verdict}
+              </p>
+            )}
+
+            <div className="mt-8 grid gap-x-10 gap-y-6 sm:grid-cols-2">
               {[
                 { label: "Best aspect", value: game.best_aspect },
                 { label: "Biggest weakness", value: game.biggest_weakness },
-                { label: "Recommendation", value: game.recommendation },
-                { label: "Replay value", value: game.replay_recommendation },
               ]
                 .filter((item) => item.value)
                 .map((item) => (
-                  <div key={item.label} className="border-t border-white/10 pt-4">
-                    <dt className="eyebrow">{item.label}</dt>
-                    <dd className="mt-2 text-sm leading-relaxed text-silver/80">{item.value}</dd>
+                  <div key={item.label} className="border-t border-line pt-3">
+                    <p className="kicker">{item.label}</p>
+                    <p className="mt-2 text-[13px] leading-relaxed text-silver">{item.value}</p>
                   </div>
                 ))}
-            </dl>
+            </div>
 
-            {game.final_verdict && (
-              <div className="mt-8">
-                <Markdown content={game.final_verdict} />
-              </div>
-            )}
-
-            {game.why_archived && (
-              <div className="mt-8 border-l border-blood/50 pl-5">
-                <p className="eyebrow text-blood/80">Final word</p>
-                <p className="mt-3 font-serif text-xl italic leading-relaxed text-soft/90">
-                  {game.why_archived}
-                </p>
-              </div>
-            )}
+            <Link href="/collection" className="link-quiet mt-8">
+              Back to the collection
+              <ArrowRight className="size-3.5" />
+            </Link>
           </div>
         </div>
-      </Section>
+      </section>
 
-      {/* 09 — related */}
-      {game.related.length > 0 && (
-        <Section id="related" index={9} label="Related games" title="Keep reading the archive">
-          <div className="grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
-            {game.related.map((related) => (
-              <GameCoverCard
-                key={related.id}
-                game={{
-                  id: related.id,
-                  slug: related.slug,
-                  title: related.title,
-                  cover_url: related.cover_url,
-                  status: related.status,
-                  rating: related.rating,
-                  release_year: related.release_year,
-                  genres: [],
-                  platforms: [],
-                  summary: null,
-                }}
-              />
-            ))}
-          </div>
-
-          <div className="mt-12 flex flex-wrap items-center gap-4">
-            <Link
-              href="/collection"
-              className="group inline-flex items-center gap-3 border border-white/15 px-6 py-3.5 font-mono text-[10px] uppercase tracking-[0.2em] text-soft transition-colors hover:border-blood/60 hover:bg-blood/[0.06]"
-            >
-              All archive entries
-              <ArrowUpRight className="size-3.5 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+      {/* ── 08 · Related ──────────────────────────────────────────── */}
+      <section id="related" className="scroll-mt-32 py-14 md:py-20">
+        <div className="shell">
+          <div className="flex flex-wrap items-end justify-between gap-4 border-t border-line pt-6">
+            <div>
+              <p className="kicker">08 — Related files</p>
+              <h2 className="display mt-4 text-[clamp(1.7rem,3vw,2.3rem)] text-soft">
+                If this one stayed, these might too
+              </h2>
+            </div>
+            <Link href="/collection" className="link-quiet">
+              The whole collection
+              <ArrowUpRight className="size-3.5" />
             </Link>
-            <Rating value={game.rating} className="ml-2" />
           </div>
-        </Section>
-      )}
+
+          {game.related.length > 0 ? (
+            <div className="mt-8 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4 lg:gap-6">
+              {game.related.map((item) => (
+                <GameCoverCard
+                  key={item.id}
+                  game={{
+                    id: item.id,
+                    slug: item.slug,
+                    title: item.title,
+                    cover_url: item.cover_url,
+                    status: item.status,
+                    rating: item.rating,
+                    release_year: item.release_year,
+                    genres: [],
+                    platforms: [],
+                    summary: null,
+                  }}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="mt-6 text-[13px] text-muted">
+              No related files linked yet —{" "}
+              <Link href="/collection" className="underline underline-offset-4 hover:text-soft">
+                browse the collection
+              </Link>
+              .
+            </p>
+          )}
+        </div>
+      </section>
     </>
   );
 }

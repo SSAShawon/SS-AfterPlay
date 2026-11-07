@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 
 import { cn } from "@/lib/utils";
 
@@ -15,9 +16,9 @@ interface ArchiveImageProps {
 }
 
 /**
- * Artwork is hosted externally (ImgBB direct URLs), so a URL can disappear.
- * This renders a controlled placeholder instead of a broken image, and never
- * shifts layout because the container owns the aspect ratio.
+ * Artwork is hosted externally (ImgBB / Steam CDN), so a URL can disappear.
+ * This renders a quiet typographic placeholder instead of a broken image and
+ * keeps layout stable because the container owns the aspect ratio.
  */
 export function ArchiveImage({
   src,
@@ -29,11 +30,9 @@ export function ArchiveImage({
   sizes,
 }: ArchiveImageProps) {
   const [failed, setFailed] = React.useState(false);
-  const [loaded, setLoaded] = React.useState(false);
 
   React.useEffect(() => {
     setFailed(false);
-    setLoaded(false);
   }, [src]);
 
   const showImage = Boolean(src) && !failed;
@@ -41,39 +40,28 @@ export function ArchiveImage({
   return (
     <div className={cn("relative overflow-hidden bg-charcoal", className)}>
       {showImage ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <Image
           src={src as string}
           alt={alt}
-          sizes={sizes}
+          fill
+          priority={priority}
           loading={priority ? "eager" : "lazy"}
-          decoding="async"
+          sizes={sizes ?? "(max-width: 768px) 100vw, 50vw"}
+          quality={82}
           onError={() => setFailed(true)}
-          onLoad={() => setLoaded(true)}
-          className={cn(
-            "size-full object-cover transition-all duration-700",
-            loaded ? "opacity-100 blur-0" : "opacity-0 blur-sm",
-            imgClassName,
-          )}
+          className={cn("object-cover", imgClassName)}
         />
       ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[linear-gradient(150deg,#14161B,#0b0c10)]">
-          <div
-            className="absolute inset-0 opacity-[0.16]"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(135deg, rgba(244,244,245,0.10) 0px, rgba(244,244,245,0.10) 1px, transparent 1px, transparent 12px)",
-            }}
-          />
-          <span className="relative font-serif text-2xl text-silver/50">
-            {fallbackLabel?.slice(0, 2).toUpperCase() ?? "SS"}
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#101216]">
+          <span className="font-serif text-2xl leading-none text-silver/45">
+            {(fallbackLabel ?? "SS").slice(0, 2).toUpperCase()}
           </span>
-          <span className="relative max-w-[80%] text-center font-mono text-[8px] uppercase tracking-[0.24em] text-silver/30">
-            SS · Afterplay
+          <span className="h-px w-6 bg-line-strong" aria-hidden />
+          <span className="text-[8px] font-medium uppercase tracking-[0.26em] text-muted">
+            Afterplay
           </span>
         </div>
       )}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/60 via-transparent to-transparent opacity-60" />
     </div>
   );
 }

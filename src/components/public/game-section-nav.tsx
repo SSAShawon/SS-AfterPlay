@@ -26,7 +26,7 @@ export function GameSectionNav({ sections }: { sections: NavSection[] }) {
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
         if (visible[0]) setActive(visible[0].target.id);
       },
-      { rootMargin: "-30% 0px -60% 0px", threshold: [0.01, 0.25, 0.5] },
+      { rootMargin: "-25% 0px -65% 0px", threshold: [0.01, 0.3] },
     );
 
     elements.forEach((element) => observer.observe(element));
@@ -34,10 +34,10 @@ export function GameSectionNav({ sections }: { sections: NavSection[] }) {
   }, [sections]);
 
   return (
-    <div className="sticky top-[68px] z-40 border-y border-white/10 bg-void/92 backdrop-blur-xl md:top-[78px]">
+    <div className="sticky top-[62px] z-40 border-y border-line bg-void md:top-[72px]">
       <div className="shell">
         <nav
-          className="scrollbar-none flex items-center gap-1 overflow-x-auto py-2"
+          className="scrollbar-none flex items-center gap-6 overflow-x-auto py-3"
           aria-label="On this page"
         >
           {sections.map((section, index) => (
@@ -45,13 +45,15 @@ export function GameSectionNav({ sections }: { sections: NavSection[] }) {
               key={section.id}
               href={`#${section.id}`}
               className={cn(
-                "shrink-0 border-b px-3 py-2 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors",
+                "flex shrink-0 items-baseline gap-1.5 border-b py-0.5 text-[9.5px] font-medium uppercase tracking-[0.16em] transition-colors duration-200",
                 active === section.id
                   ? "border-blood text-soft"
-                  : "border-transparent text-silver/50 hover:text-soft",
+                  : "border-transparent text-muted hover:text-soft",
               )}
             >
-              <span className="mr-1.5 text-blood/50">{String(index + 1).padStart(2, "0")}</span>
+              <span className="tabular-nums text-blood/70">
+                {String(index + 1).padStart(2, "0")}
+              </span>
               {section.label}
             </a>
           ))}

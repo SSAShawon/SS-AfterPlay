@@ -3,32 +3,39 @@
 import * as React from "react";
 
 export function ReadingProgress() {
-  const [progress, setProgress] = React.useState(0);
+  const barRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
+    let frame = 0;
+
     const update = () => {
+      frame = 0;
       const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-      if (scrollable <= 0) {
-        setProgress(0);
-        return;
-      }
-      setProgress(Math.min(100, Math.max(0, (window.scrollY / scrollable) * 100)));
+      const ratio = scrollable <= 0 ? 0 : Math.min(1, Math.max(0, window.scrollY / scrollable));
+      if (barRef.current) barRef.current.style.transform = `scaleX(${ratio})`;
+    };
+
+    const onScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(update);
     };
 
     update();
-    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", update);
     return () => {
-      window.removeEventListener("scroll", update);
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", update);
     };
   }, []);
 
   return (
-    <div className="fixed inset-x-0 top-0 z-[95] h-[2px] bg-white/5" aria-hidden>
+    <div className="fixed inset-x-0 top-0 z-[95] h-[2px] bg-white/[0.04]" aria-hidden>
       <div
-        className="h-full bg-gradient-to-r from-blood/70 to-blood transition-[width] duration-150 ease-out"
-        style={{ width: `${progress}%` }}
+        ref={barRef}
+        className="h-full w-full origin-left bg-blood"
+        style={{ transform: "scaleX(0)", willChange: "transform" }}
       />
     </div>
   );

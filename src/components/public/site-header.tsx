@@ -19,16 +19,8 @@ const NAV = [
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const [scrolled, setScrolled] = React.useState(false);
   const [menuOpen, setMenuOpen] = React.useState(false);
   const { open: openSearch } = useSearchOverlay();
-
-  React.useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   React.useEffect(() => {
     setMenuOpen(false);
@@ -47,23 +39,11 @@ export function SiteHeader() {
 
   return (
     <>
-      <header
-        className={cn(
-          "fixed inset-x-0 top-0 z-[90] transition-all duration-500",
-          scrolled
-            ? "border-b border-white/10 bg-void/85 backdrop-blur-xl"
-            : "border-b border-transparent bg-gradient-to-b from-black/55 to-transparent",
-        )}
-      >
-        <div className="shell flex h-[68px] items-center justify-between gap-6 md:h-[78px]">
-          <Link href="/" className="group flex items-center gap-3" aria-label="SS Afterplay — home">
-            <span className="relative flex flex-col leading-none">
-              <span className="display text-[1.4rem] tracking-[0.2em] text-soft transition-colors group-hover:text-white">
-                SS
-              </span>
-              <span className="mt-0.5 h-px w-full bg-blood/70" />
-            </span>
-            <span className="font-mono text-[9px] uppercase tracking-[0.34em] text-silver/80 transition-colors group-hover:text-silver md:text-[10px]">
+      <header className="sticky top-0 z-[90] border-b border-line bg-void">
+        <div className="shell flex h-[62px] items-center justify-between gap-6 md:h-[72px]">
+          <Link href="/" className="flex items-baseline gap-2.5" aria-label="SS Afterplay — home">
+            <span className="font-serif text-[1.6rem] leading-none text-soft">SS</span>
+            <span className="text-[9.5px] font-medium uppercase tracking-[0.34em] text-silver">
               Afterplay
             </span>
           </Link>
@@ -73,9 +53,12 @@ export function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={isActive(item.href) ? "page" : undefined}
                 className={cn(
-                  "link-underline font-mono text-[10px] uppercase tracking-[0.2em] transition-colors",
-                  isActive(item.href) ? "text-soft" : "text-silver/70 hover:text-soft",
+                  "border-b py-1.5 text-[10.5px] font-medium uppercase tracking-[0.18em] transition-colors duration-200",
+                  isActive(item.href)
+                    ? "border-blood text-soft"
+                    : "border-transparent text-silver hover:text-soft",
                 )}
               >
                 {item.label}
@@ -83,18 +66,18 @@ export function SiteHeader() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={openSearch}
               aria-label="Search the archive"
-              className="group flex items-center gap-3 border border-white/12 px-3 py-2 transition-colors hover:border-blood/50"
+              className="flex h-9 items-center gap-2 px-2 text-silver transition-colors duration-200 hover:text-soft"
             >
-              <Search className="size-3.5 text-silver transition-colors group-hover:text-soft" />
-              <span className="hidden font-mono text-[9px] uppercase tracking-[0.22em] text Silver/60 text-silver/60 md:inline">
+              <Search className="size-[15px]" />
+              <span className="hidden text-[10px] font-medium uppercase tracking-[0.18em] md:inline">
                 Search
               </span>
-              <kbd className="hidden border border-white/12 px-1.5 py-0.5 font-mono text-[9px] text-silver/50 md:inline">
+              <kbd className="hidden border border-line px-1.5 py-0.5 text-[9px] tabular-nums text-muted lg:inline">
                 ⌘K
               </kbd>
             </button>
@@ -103,59 +86,54 @@ export function SiteHeader() {
               type="button"
               onClick={() => setMenuOpen(true)}
               aria-label="Open menu"
-              className="flex size-9 items-center justify-center border border-white/12 text-silver transition-colors hover:border-blood/50 hover:text-soft lg:hidden"
+              className="flex size-9 items-center justify-center text-silver transition-colors hover:text-soft lg:hidden"
             >
-              <Menu className="size-4" />
+              <Menu className="size-[18px]" />
             </button>
           </div>
         </div>
       </header>
 
-      {/* mobile menu */}
+      {/* mobile navigation */}
       <div
         className={cn(
-          "fixed inset-0 z-[100] bg-void transition-all duration-500 lg:hidden",
+          "fixed inset-0 z-[100] bg-void transition-opacity duration-200 lg:hidden",
           menuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0",
         )}
         aria-hidden={!menuOpen}
       >
-        <div className="grain absolute inset-0 opacity-60" />
-        <div className="shell relative flex h-[68px] items-center justify-between">
-          <span className="display text-[1.4rem] tracking-[0.2em]">SS</span>
+        <div className="shell flex h-[62px] items-center justify-between border-b border-line">
+          <span className="font-serif text-[1.6rem] leading-none">SS</span>
           <button
             type="button"
             onClick={() => setMenuOpen(false)}
             aria-label="Close menu"
-            className="flex size-9 items-center justify-center border border-white/12 text-silver"
+            className="flex size-9 items-center justify-center text-silver"
           >
-            <X className="size-4" />
+            <X className="size-[18px]" />
           </button>
         </div>
 
-        <nav className="shell relative mt-6 flex flex-col" aria-label="Mobile">
+        <nav className="shell flex flex-col pt-2" aria-label="Mobile">
           {NAV.map((item, index) => (
             <Link
               key={item.href}
               href={item.href}
-              className="group flex items-baseline justify-between border-b border-white/10 py-5"
+              className="flex items-baseline justify-between border-b border-line py-4"
             >
               <span className="flex items-baseline gap-4">
-                <span className="font-mono text-[9px] text-blood/70">
+                <span className="text-[10px] tabular-nums text-blood">
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <span className="display text-4xl text-soft transition-transform duration-500 group-hover:translate-x-1">
-                  {item.label}
-                </span>
+                <span className="font-serif text-[2rem] leading-none text-soft">{item.label}</span>
               </span>
-              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-silver/40">
-                Open
-              </span>
+              <span className="text-[9px] uppercase tracking-[0.18em] text-muted">Open</span>
             </Link>
           ))}
         </nav>
 
-        <div className="shell relative mt-10 flex items-center justify-between">
-          <p className="max-w-[60%] font-serif text-sm italic text-silver/60">
+        <div className="shell mt-8 flex items-center justify-between">
+          <p className="max-w-[60%] font-serif text-base italic text-silver">
             The game ends. The memories don&apos;t.
           </p>
           <button
@@ -164,7 +142,7 @@ export function SiteHeader() {
               setMenuOpen(false);
               openSearch();
             }}
-            className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-silver"
+            className="link-quiet"
           >
             <Search className="size-3.5" /> Search
           </button>

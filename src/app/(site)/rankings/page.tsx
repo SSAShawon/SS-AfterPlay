@@ -5,7 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 import { ArchiveImage } from "@/components/public/archive-image";
 import { EmptyState, PageHeader, Rating } from "@/components/public/primitives";
 import { getRankings } from "@/lib/queries/rankings";
-import { cn, pad } from "@/lib/utils";
+import { pad } from "@/lib/utils";
 import { GAME_STATUS_LABELS } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -40,7 +40,7 @@ export default async function RankingsPage() {
       />
 
       {populated.length === 0 ? (
-        <section className="shell py-16">
+        <section className="shell py-14">
           <EmptyState
             title="No rankings published yet."
             description="Create a ranking category in the admin panel, then add games to it."
@@ -48,105 +48,125 @@ export default async function RankingsPage() {
         </section>
       ) : (
         <>
-          <nav className="sticky top-[68px] z-40 border-b border-white/10 bg-void/92 backdrop-blur-xl md:top-[78px]">
-            <div className="shell scrollbar-none flex items-center gap-1 overflow-x-auto py-2">
+          <nav className="sticky top-[62px] z-40 border-b border-line bg-void md:top-[72px]">
+            <div className="shell scrollbar-none flex items-center gap-6 overflow-x-auto py-3">
               {populated.map((category, index) => (
                 <a
                   key={category.id}
                   href={`#${category.slug}`}
-                  className="shrink-0 border-b border-transparent px-3 py-2 font-mono text-[9px] uppercase tracking-[0.16em] text-silver/50 transition-colors hover:border-blood hover:text-soft"
+                  className="flex shrink-0 items-baseline gap-2 border-b border-transparent py-0.5 text-[9.5px] font-medium uppercase tracking-[0.16em] text-muted transition-colors hover:border-blood hover:text-soft"
                 >
-                  <span className="mr-1.5 text-blood/50">{pad(index + 1)}</span>
+                  <span className="tabular-nums text-blood/60">{pad(index + 1)}</span>
                   {category.title}
                 </a>
               ))}
             </div>
           </nav>
 
-          <div className="shell py-14 md:py-20">
-            <div className="space-y-20 md:space-y-28">
-              {populated.map((category, categoryIndex) => (
-                <section key={category.id} id={category.slug} className="scroll-mt-32">
-                  <div className="flex flex-col gap-3 border-b border-white/10 pb-5 md:flex-row md:items-end md:justify-between">
-                    <div>
-                      <div className="flex items-center gap-3">
-                        <span className="font-mono text-[10px] text-blood/80">
+          <div className="shell py-10 md:py-14">
+            {populated.map((category, categoryIndex) => (
+              <section
+                key={category.id}
+                id={category.slug}
+                className="scroll-mt-32 border-t border-line py-12 first:border-t-0 first:pt-0 md:py-16"
+              >
+                <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
+                  <div className="lg:col-span-4">
+                    <div className="lg:sticky lg:top-32">
+                      <div className="flex items-baseline gap-3">
+                        <span className="text-[11px] tabular-nums tracking-[0.1em] text-blood">
                           {pad(categoryIndex + 1)}
                         </span>
-                        <span className="h-px w-8 bg-white/20" />
-                        <span className="eyebrow">Ranking</span>
+                        <span className="kicker">Ranking</span>
                       </div>
-                      <h2 className="display mt-4 text-[clamp(1.9rem,4vw,3rem)] text-soft">
+
+                      <h2 className="display mt-4 text-[clamp(2rem,3.6vw,2.9rem)] text-soft">
                         {category.title}
                       </h2>
+
                       {category.description && (
-                        <p className="mt-3 max-w-xl text-sm leading-relaxed text-silver/70">
+                        <p className="mt-4 max-w-sm text-[13px] leading-relaxed text-silver">
                           {category.description}
                         </p>
                       )}
+
+                      <p className="mt-5 text-[10px] uppercase tracking-[0.16em] text-muted">
+                        {category.entries.length} {category.entries.length === 1 ? "entry" : "entries"}
+                      </p>
                     </div>
-                    <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-silver/40">
-                      {category.entries.length} entries
-                    </span>
                   </div>
 
-                  <ol className="mt-6">
-                    {category.entries.map((entry, index) => (
-                      <li key={entry.id}>
-                        <Link
-                          href={`/games/${entry.games?.slug}`}
-                          className={cn(
-                            "group grid grid-cols-[auto_auto_1fr_auto] items-center gap-4 border-b border-white/[0.07] py-5 transition-colors hover:border-blood/40 md:gap-8",
-                          )}
-                        >
-                          <span
-                            className={cn(
-                              "font-serif text-3xl leading-none md:text-5xl",
-                              index === 0
-                                ? "text-blood"
-                                : index < 3
-                                  ? "text-soft/60"
-                                  : "text-white/20",
-                            )}
-                          >
-                            {String(index + 1).padStart(2, "0")}
-                          </span>
+                  <div className="lg:col-span-8">
+                    <ol className="border-t border-line">
+                      {category.entries.map((entry, index) => {
+                        const game = entry.games;
+                        return (
+                          <li key={entry.id} className="border-b border-line">
+                            <Link
+                              href={game ? `/games/${game.slug}` : "/collection"}
+                              className="group grid grid-cols-[2rem_1fr_auto] items-center gap-4 py-4 md:grid-cols-[2.5rem_3rem_1fr_auto_auto] md:gap-5"
+                            >
+                              <span className="font-serif text-[1.5rem] leading-none text-muted/70 transition-colors group-hover:text-blood">
+                                {String(index + 1).padStart(2, "0")}
+                              </span>
 
-                          <ArchiveImage
-                            src={entry.games?.cover_url}
-                            alt={entry.games?.title ?? ""}
-                            fallbackLabel={entry.games?.title ?? ""}
-                            className="aspect-[3/4] w-12 shrink-0 border border-white/10 md:w-14"
-                          />
+                              <ArchiveImage
+                                src={game?.cover_url ?? null}
+                                alt={game?.title ?? "Game"}
+                                fallbackLabel={game?.title ?? "SS"}
+                                sizes="48px"
+                                className="hidden aspect-[3/4] w-12 border border-line md:block"
+                              />
 
-                          <div className="min-w-0">
-                            <h3 className="truncate font-serif text-xl text-soft transition-colors group-hover:text-white md:text-2xl">
-                              {entry.games?.title}
-                            </h3>
-                            <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.16em] text-silver/40">
-                              {[entry.games?.release_year, entry.games ? GAME_STATUS_LABELS[entry.games.status] : null]
-                                .filter(Boolean)
-                                .join(" · ")}
-                            </p>
-                            {entry.note && (
-                              <p className="mt-2 max-w-xl text-xs leading-relaxed text-silver/60">
-                                “{entry.note}”
-                              </p>
-                            )}
-                          </div>
+                              <div className="min-w-0">
+                                <h3 className="truncate font-serif text-[1.25rem] leading-tight text-soft transition-colors group-hover:text-white md:text-[1.45rem]">
+                                  {game?.title ?? "Unknown game"}
+                                </h3>
+                                <p className="mt-1 flex flex-wrap items-center gap-x-2 text-[9.5px] uppercase tracking-[0.14em] text-muted">
+                                  {game?.release_year && <span>{game.release_year}</span>}
+                                  {game?.status && (
+                                    <>
+                                      <span aria-hidden>/</span>
+                                      <span>{GAME_STATUS_LABELS[game.status]}</span>
+                                    </>
+                                  )}
+                                  {entry.note && (
+                                    <>
+                                      <span aria-hidden>/</span>
+                                      <span className="font-serif text-[11.5px] italic normal-case tracking-normal text-silver">
+                                        “{entry.note}”
+                                      </span>
+                                    </>
+                                  )}
+                                </p>
+                              </div>
 
-                          <div className="flex items-center gap-4">
-                            <Rating value={entry.games?.rating ?? null} />
-                            <ArrowUpRight className="hidden size-4 text-silver/25 transition-all duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-soft md:block" />
-                          </div>
-                        </Link>
-                      </li>
-                    ))}
-                  </ol>
-                </section>
-              ))}
-            </div>
+                              <div className="flex items-center gap-4">
+                                <Rating value={game?.rating ?? null} />
+                                <ArrowUpRight className="size-3.5 text-muted transition-colors group-hover:text-soft" />
+                              </div>
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  </div>
+                </div>
+              </section>
+            ))}
           </div>
+
+          <section className="border-t border-line py-12">
+            <div className="shell flex flex-wrap items-center justify-between gap-4">
+              <p className="text-[10px] uppercase tracking-[0.16em] text-muted">
+                Ranked by hand, not by algorithm
+              </p>
+              <Link href="/collection" className="link-quiet">
+                The full collection
+                <ArrowUpRight className="size-3.5" />
+              </Link>
+            </div>
+          </section>
         </>
       )}
     </>

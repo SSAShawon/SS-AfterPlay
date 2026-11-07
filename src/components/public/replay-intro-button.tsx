@@ -22,9 +22,9 @@ export function ReplayIntroButton() {
         window.scrollTo({ top: 0 });
         window.setTimeout(() => window.location.assign("/"), 120);
       }}
-      className="group inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.22em] text-silver/50 transition-colors hover:text-soft"
+      className="group inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-muted transition-colors hover:text-silver"
     >
-      <RotateCcw className="size-3 transition-transform duration-500 group-hover:-rotate-90" />
+      <RotateCcw className="size-3 transition-transform duration-200 group-hover:-rotate-90" />
       Replay intro
     </button>
   );

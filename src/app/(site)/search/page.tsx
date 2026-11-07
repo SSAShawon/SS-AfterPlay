@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Search } from "lucide-react";
 
 import { ArchiveImage } from "@/components/public/archive-image";
-import { EmptyState, PageHeader } from "@/components/public/primitives";
+import { EmptyState } from "@/components/public/primitives";
 import { searchArchive } from "@/lib/queries/search";
-import { formatDate, pad } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -34,33 +34,42 @@ export default async function SearchPage({ searchParams }: PageProps) {
 
   return (
     <>
-      <PageHeader
-        kicker="Search"
-        title={term ? `Results for “${term}”` : "Search the archive"}
-        intro={
-          term
-            ? `${total} ${total === 1 ? "match" : "matches"} across games, characters, chapters, memories and essays.`
-            : "Search game titles, storylines, characters, chapter names, memories and journal entries."
-        }
-      />
+      <header className="border-b border-line pb-10 pt-32 md:pb-12 md:pt-40">
+        <div className="shell">
+          <div className="flex items-center gap-3">
+            <span className="archivedot" aria-hidden />
+            <p className="kicker">Search</p>
+          </div>
 
-      <section className="shell py-14 md:py-20">
-        <form action="/search" className="mb-12 flex flex-col gap-3 sm:flex-row">
-          <input
-            name="q"
-            defaultValue={term}
-            placeholder="Try “Red Dead”, “Ellie”, “Erdtree”…"
-            aria-label="Search"
-            className="h-12 flex-1 border border-white/15 bg-white/[0.02] px-4 font-serif text-lg text-soft placeholder:text-silver/35 focus:border-blood/60 focus:outline-none"
-          />
-          <button
-            type="submit"
-            className="h-12 border border-white/20 px-8 font-mono text-[10px] uppercase tracking-[0.22em] text-soft transition-colors hover:border-blood/60 hover:bg-blood/[0.06]"
-          >
-            Search
-          </button>
-        </form>
+          <h1 className="display mt-6 max-w-[20ch] text-[clamp(2.2rem,5vw,3.8rem)] text-soft">
+            {term ? `Results for “${term}”` : "Search the archive"}
+          </h1>
 
+          <p className="mt-4 max-w-xl text-[13.5px] leading-relaxed text-silver">
+            {term
+              ? `${total} ${total === 1 ? "match" : "matches"} across games, characters, chapters, memories and essays.`
+              : "Search game titles, storylines, characters, chapter names, memories and journal entries."}
+          </p>
+
+          <form action="/search" className="mt-8 flex max-w-2xl items-end gap-4" role="search">
+            <label className="flex h-11 flex-1 items-center border-b border-line-strong focus-within:border-soft">
+              <Search className="size-4 text-muted" />
+              <input
+                name="q"
+                defaultValue={term}
+                placeholder="Try “Red Dead”, “Ellie”, “Erdtree”…"
+                aria-label="Search"
+                className="h-full w-full bg-transparent pl-3 font-serif text-[1.15rem] text-soft placeholder:text-muted/70 focus:outline-none"
+              />
+            </label>
+            <button type="submit" className="btn h-11">
+              Search
+            </button>
+          </form>
+        </div>
+      </header>
+
+      <section className="shell py-10 md:py-14">
         {!term && (
           <EmptyState
             title="Start typing to search."
@@ -77,136 +86,180 @@ export default async function SearchPage({ searchParams }: PageProps) {
         )}
 
         {results && total > 0 && (
-          <div className="space-y-14">
+          <div className="space-y-12">
             {results.games.length > 0 && (
-              <Group index={1} label="Games">
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <section>
+                <div className="flex items-baseline justify-between border-b border-line pb-3">
+                  <h2 className="kicker">Games</h2>
+                  <span className="text-[10px] tabular-nums text-muted">
+                    {String(results.games.length).padStart(2, "0")}
+                  </span>
+                </div>
+                <div>
                   {results.games.map((game) => (
                     <Link
                       key={game.id}
                       href={`/games/${game.slug}`}
-                      className="group flex items-center gap-4 border border-white/10 bg-white/[0.015] p-3 transition-colors hover:border-blood/40"
+                      className="group flex items-center gap-5 border-b border-line py-4"
                     >
                       <ArchiveImage
                         src={game.cover_url}
                         alt={game.title}
                         fallbackLabel={game.title}
-                        className="aspect-[3/4] w-14 shrink-0 border border-white/10"
+                        sizes="48px"
+                        className="aspect-[3/4] w-10 shrink-0 border border-line"
                       />
-                      <div className="min-w-0">
-                        <p className="truncate font-serif text-lg text-soft">{game.title}</p>
-                        <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.16em] text-silver/45">
-                          {[game.release_year, game.status].filter(Boolean).join(" · ")}
+                      <div className="min-w-0 flex-1">
+                        <h3 className="truncate font-serif text-[1.3rem] leading-tight text-soft transition-colors group-hover:text-white">
+                          {game.title}
+                        </h3>
+                        <p className="mt-1 text-[9.5px] uppercase tracking-[0.14em] text-muted">
+                          {[game.release_year, game.status?.replace("_", " ")].filter(Boolean).join(" / ")}
                         </p>
                       </div>
+                      <ArrowUpRight className="size-3.5 text-muted transition-colors group-hover:text-soft" />
                     </Link>
                   ))}
                 </div>
-              </Group>
+              </section>
             )}
 
             {results.posts.length > 0 && (
-              <Group index={2} label="Journal">
+              <section>
+                <div className="flex items-baseline justify-between border-b border-line pb-3">
+                  <h2 className="kicker">Journal</h2>
+                  <span className="text-[10px] tabular-nums text-muted">
+                    {String(results.posts.length).padStart(2, "0")}
+                  </span>
+                </div>
                 <div>
                   {results.posts.map((post) => (
                     <Link
                       key={post.id}
                       href={`/journal/${post.slug}`}
-                      className="group flex items-baseline justify-between gap-6 border-b border-white/[0.07] py-4 transition-colors hover:border-blood/40"
+                      className="group flex items-center gap-5 border-b border-line py-4"
                     >
-                      <span className="font-serif text-xl text-soft">{post.title}</span>
-                      <span className="hidden max-w-sm truncate text-right text-xs text-silver/50 sm:block">
-                        {post.excerpt}
-                      </span>
+                      <ArchiveImage
+                        src={post.cover_url}
+                        alt={post.title}
+                        fallbackLabel={post.title}
+                        sizes="64px"
+                        className="aspect-[4/3] w-16 shrink-0 border border-line"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <h3 className="truncate font-serif text-[1.3rem] leading-tight text-soft transition-colors group-hover:text-white">
+                          {post.title}
+                        </h3>
+                        {post.excerpt && (
+                          <p className="mt-1 line-clamp-1 text-[12px] text-silver">{post.excerpt}</p>
+                        )}
+                      </div>
+                      <ArrowUpRight className="size-3.5 text-muted transition-colors group-hover:text-soft" />
                     </Link>
                   ))}
                 </div>
-              </Group>
+              </section>
             )}
 
             {results.characters.length > 0 && (
-              <Group index={3} label="Characters">
-                <div className="grid gap-4 sm:grid-cols-2">
+              <section>
+                <div className="flex items-baseline justify-between border-b border-line pb-3">
+                  <h2 className="kicker">Characters</h2>
+                  <span className="text-[10px] tabular-nums text-muted">
+                    {String(results.characters.length).padStart(2, "0")}
+                  </span>
+                </div>
+                <div>
                   {results.characters.map((character) => (
                     <Link
                       key={character.id}
                       href={`/games/${character.game_slug}#characters`}
-                      className="group flex items-center justify-between gap-4 border border-white/10 p-4 transition-colors hover:border-blood/40"
+                      className="group flex items-center gap-5 border-b border-line py-4"
                     >
-                      <div>
-                        <p className="font-serif text-lg text-soft">{character.name}</p>
-                        <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.16em] text-silver/45">
-                          {character.game_title}
-                          {character.role ? ` · ${character.role}` : ""}
+                      <ArchiveImage
+                        src={character.portrait_url}
+                        alt={character.name}
+                        fallbackLabel={character.name}
+                        sizes="40px"
+                        className="aspect-[3/4] w-10 shrink-0 border border-line"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <h3 className="truncate font-serif text-[1.3rem] leading-tight text-soft transition-colors group-hover:text-white">
+                          {character.name}
+                        </h3>
+                        <p className="mt-1 truncate text-[9.5px] uppercase tracking-[0.14em] text-muted">
+                          {[character.game_title, character.role].filter(Boolean).join(" / ")}
                         </p>
                       </div>
-                      <ArrowUpRight className="size-3.5 text-silver/30 group-hover:text-soft" />
+                      <ArrowUpRight className="size-3.5 text-muted transition-colors group-hover:text-soft" />
                     </Link>
                   ))}
                 </div>
-              </Group>
+              </section>
             )}
 
             {results.chapters.length > 0 && (
-              <Group index={4} label="Chapters">
+              <section>
+                <div className="flex items-baseline justify-between border-b border-line pb-3">
+                  <h2 className="kicker">Storyline & chapters</h2>
+                  <span className="text-[10px] tabular-nums text-muted">
+                    {String(results.chapters.length).padStart(2, "0")}
+                  </span>
+                </div>
                 <div>
                   {results.chapters.map((chapter) => (
                     <Link
                       key={chapter.id}
                       href={`/games/${chapter.game_slug}#chapters`}
-                      className="group flex items-baseline justify-between gap-6 border-b border-white/[0.07] py-3.5 transition-colors hover:border-blood/40"
+                      className="group flex items-center justify-between gap-5 border-b border-line py-4"
                     >
-                      <span className="font-serif text-lg text-soft">{chapter.title}</span>
-                      <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-silver/40">
-                        {chapter.game_title}
-                      </span>
+                      <div className="min-w-0">
+                        <h3 className="truncate font-serif text-[1.2rem] leading-tight text-soft transition-colors group-hover:text-white">
+                          {chapter.title}
+                        </h3>
+                        <p className="mt-1 text-[9.5px] uppercase tracking-[0.14em] text-muted">
+                          {chapter.game_title}
+                        </p>
+                      </div>
+                      <ArrowUpRight className="size-3.5 text-muted transition-colors group-hover:text-soft" />
                     </Link>
                   ))}
                 </div>
-              </Group>
+              </section>
             )}
 
             {results.memories.length > 0 && (
-              <Group index={5} label="Memories">
+              <section>
+                <div className="flex items-baseline justify-between border-b border-line pb-3">
+                  <h2 className="kicker">Memories</h2>
+                  <span className="text-[10px] tabular-nums text-muted">
+                    {String(results.memories.length).padStart(2, "0")}
+                  </span>
+                </div>
                 <div>
                   {results.memories.map((memory) => (
                     <Link
                       key={memory.id}
                       href="/memories"
-                      className="group flex items-baseline justify-between gap-6 border-b border-white/[0.07] py-3.5 transition-colors hover:border-blood/40"
+                      className="group flex items-center justify-between gap-5 border-b border-line py-4"
                     >
-                      <span className="font-serif text-lg text-soft">{memory.title}</span>
-                      <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-silver/40">
-                        {formatDate(memory.occurred_on, "short") ?? "Memory"}
-                      </span>
+                      <div className="min-w-0">
+                        <h3 className="truncate font-serif text-[1.2rem] leading-tight text-soft transition-colors group-hover:text-white">
+                          {memory.title}
+                        </h3>
+                        <p className="mt-1 text-[9.5px] uppercase tracking-[0.14em] text-muted">
+                          {formatDate(memory.occurred_on, "short") ?? "Memory"}
+                        </p>
+                      </div>
+                      <ArrowUpRight className="size-3.5 text-muted transition-colors group-hover:text-soft" />
                     </Link>
                   ))}
                 </div>
-              </Group>
+              </section>
             )}
           </div>
         )}
       </section>
     </>
-  );
-}
-
-function Group({
-  index,
-  label,
-  children,
-}: {
-  index: number;
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section>
-      <div className="mb-5 flex items-center gap-3 border-b border-white/10 pb-3">
-        <span className="font-mono text-[10px] text-blood/80">{pad(index)}</span>
-        <span className="eyebrow">{label}</span>
-      </div>
-      {children}
-    </section>
   );
 }

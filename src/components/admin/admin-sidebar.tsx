@@ -66,7 +66,7 @@ export function AdminSidebar({ email }: { email: string }) {
   return (
     <>
       {/* mobile top bar */}
-      <div className="sticky top-0 z-50 flex items-center justify-between border-b border-white/10 bg-void/95 px-4 py-3 backdrop-blur lg:hidden">
+      <div className="sticky top-0 z-50 flex items-center justify-between border-b border-white/10 bg-void px-4 py-3 lg:hidden">
         <Link href="/admin" className="display text-lg tracking-[0.2em]">
           SS · Admin
         </Link>

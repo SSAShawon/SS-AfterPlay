@@ -28,16 +28,16 @@ export function Pagination({ page, totalPages, basePath, params = {} }: Paginati
   );
 
   return (
-    <nav className="mt-14 flex items-center justify-between border-t border-white/10 pt-6" aria-label="Pagination">
+    <nav className="mt-12 flex items-center justify-between border-t border-line pt-5" aria-label="Pagination">
       {page > 1 ? (
         <Link
           href={buildHref(basePath, params, page - 1)}
-          className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-silver transition-colors hover:text-soft"
+          className="inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.16em] text-silver transition-colors hover:text-soft"
         >
           <ChevronLeft className="size-3.5" /> Previous
         </Link>
       ) : (
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-silver/25">Previous</span>
+        <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted/60">Previous</span>
       )}
 
       <div className="flex items-center gap-1">
@@ -46,7 +46,7 @@ export function Pagination({ page, totalPages, basePath, params = {} }: Paginati
           const gap = previous && value - previous > 1;
           return (
             <span key={value} className="flex items-center gap-1">
-              {gap && <span className="px-1 text-silver/30">…</span>}
+              {gap && <span className="px-1 text-muted/60">…</span>}
               <Link
                 href={buildHref(basePath, params, value)}
                 className={cn(
@@ -67,12 +67,12 @@ export function Pagination({ page, totalPages, basePath, params = {} }: Paginati
       {page < totalPages ? (
         <Link
           href={buildHref(basePath, params, page + 1)}
-          className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-silver transition-colors hover:text-soft"
+          className="inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.16em] text-silver transition-colors hover:text-soft"
         >
           Next <ChevronRight className="size-3.5" />
         </Link>
       ) : (
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-silver/25">Next</span>
+        <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted/60">Next</span>
       )}
     </nav>
   );

@@ -4,7 +4,6 @@ import { CollectionFilters } from "@/components/public/collection-filters";
 import { GameCoverCard, GameListRow } from "@/components/public/cards";
 import { EmptyState, PageHeader } from "@/components/public/primitives";
 import { Pagination } from "@/components/public/pagination";
-import { Reveal } from "@/components/public/reveal";
 import { getGames } from "@/lib/queries/games";
 import { getArchiveStats } from "@/lib/queries/stats";
 import { GAME_STATUSES, type GameStatus } from "@/lib/types";
@@ -46,7 +45,7 @@ export default async function CollectionPage({ searchParams }: PageProps) {
       status,
       sort: (params.sort as "recent" | "rating" | "title" | "release" | "playtime") ?? "recent",
       page,
-      perPage: 15,
+      perPage: 12,
     }),
     getArchiveStats(),
   ]);
@@ -67,9 +66,17 @@ export default async function CollectionPage({ searchParams }: PageProps) {
         ]}
       />
 
-      <CollectionFilters genres={result.genres} total={result.total} />
+      <CollectionFilters
+        genres={result.genres}
+        total={result.total}
+        q={params.q}
+        genre={params.genre}
+        status={status}
+        sort={params.sort ?? "recent"}
+        view={view}
+      />
 
-      <section className="shell py-14 md:py-20">
+      <section className="shell py-12 md:py-16">
         {result.items.length === 0 ? (
           <EmptyState
             title="No games match those filters."
@@ -87,15 +94,14 @@ export default async function CollectionPage({ searchParams }: PageProps) {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-x-5 gap-y-12 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6 lg:gap-y-12">
             {result.items.map((game, index) => (
-              <Reveal key={game.id} delay={(index % 5) * 50}>
-                <GameCoverCard
-                  game={game}
-                  index={(result.page - 1) * result.perPage + index + 1}
-                  priority={index < 5}
-                />
-              </Reveal>
+              <GameCoverCard
+                key={game.id}
+                game={game}
+                index={(result.page - 1) * result.perPage + index + 1}
+                priority={index < 4}
+              />
             ))}
           </div>
         )}
