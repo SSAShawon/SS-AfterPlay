@@ -13,7 +13,7 @@ import { ReadingProgress } from "@/components/public/reading-progress";
 import { Reveal } from "@/components/public/reveal";
 import { SpoilerGate } from "@/components/public/spoiler-gate";
 import { getGameBySlug } from "@/lib/queries/games";
-import { formatDate, formatRating, pad } from "@/lib/utils";
+import { cn, formatDate, formatRating, pad } from "@/lib/utils";
 import { GAME_STATUS_LABELS } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -390,17 +390,19 @@ export default async function GamePage({ params }: PageProps) {
           <div className="space-y-16">
             {game.characters.map((character, index) => (
               <Reveal key={character.id}>
-                <article className="grid gap-8 md:grid-cols-12">
-                  <div className="md:col-span-4">
-                    <ArchiveImage
-                      src={character.portrait_url}
-                      alt={character.name}
-                      fallbackLabel={character.name}
-                      className="aspect-[3/4] w-full max-w-[280px] border border-white/10"
-                    />
-                  </div>
+                <article className={cn("grid gap-8 md:grid-cols-12", !character.portrait_url && "gap-0")}>
+                  {character.portrait_url && (
+                    <div className="md:col-span-4">
+                      <ArchiveImage
+                        src={character.portrait_url}
+                        alt={character.name}
+                        fallbackLabel={character.name}
+                        className="aspect-[3/4] w-full max-w-[280px] border border-white/10"
+                      />
+                    </div>
+                  )}
 
-                  <div className="md:col-span-8">
+                  <div className={character.portrait_url ? "md:col-span-8" : "md:col-span-10"}>
                     <div className="flex items-baseline gap-3">
                       <span className="font-mono text-[10px] text-blood/70">
                         {pad(index + 1)}

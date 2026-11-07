@@ -68,8 +68,8 @@ export function ArchiveImage({
           <span className="relative font-serif text-2xl text-silver/50">
             {fallbackLabel?.slice(0, 2).toUpperCase() ?? "SS"}
           </span>
-          <span className="relative max-w-[80%] text-center font-mono text-[8px] uppercase tracking-[0.24em] text-silver/35">
-            Artwork unavailable
+          <span className="relative max-w-[80%] text-center font-mono text-[8px] uppercase tracking-[0.24em] text-silver/30">
+            SS · Afterplay
           </span>
         </div>
       )}

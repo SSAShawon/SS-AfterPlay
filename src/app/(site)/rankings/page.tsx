@@ -6,6 +6,7 @@ import { ArchiveImage } from "@/components/public/archive-image";
 import { EmptyState, PageHeader, Rating } from "@/components/public/primitives";
 import { getRankings } from "@/lib/queries/rankings";
 import { cn, pad } from "@/lib/utils";
+import { GAME_STATUS_LABELS } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -123,7 +124,9 @@ export default async function RankingsPage() {
                               {entry.games?.title}
                             </h3>
                             <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.16em] text-silver/40">
-                              {[entry.games?.release_year, entry.games?.status].filter(Boolean).join(" · ")}
+                              {[entry.games?.release_year, entry.games ? GAME_STATUS_LABELS[entry.games.status] : null]
+                                .filter(Boolean)
+                                .join(" · ")}
                             </p>
                             {entry.note && (
                               <p className="mt-2 max-w-xl text-xs leading-relaxed text-silver/60">
