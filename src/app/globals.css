@@ -137,7 +137,7 @@
     font-family: var(--font-serif);
     font-weight: 400;
     letter-spacing: -0.02em;
-    line-height: 0.94;
+    line-height: 0.97;
   }
 
   .serif {
@@ -274,7 +274,7 @@
   }
 
   .frame img {
-    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .group:hover .frame img,
